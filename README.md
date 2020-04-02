@@ -1,4 +1,4 @@
-# SNX Limit Orders Spec
+# SNX Limit Orders
 
 ## Summary
 We propose a trustless architecture for adding limit orders functionality to the Synthetix Exchange that would not require any changes to the core contracts.
@@ -11,7 +11,11 @@ To increase the flexibility of the Synthetix exchange, limit order functionality
 While limit orders can be trivial to implement in the case of centralized exchanges, in the case of a DEX such as Synthetix, limit orders can be challenging in terms of security guarantees and trustlessness due to client unavailability.
 
 ## Specification
-TODO
+
+* [LimitOrder Solidity Contract](specs/Contract.md)
+* [Limit Order Execution Service](specs/Service.md)
+* [Client-side Javascript Library](specs/Library.md)
+
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
