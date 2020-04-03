@@ -1,4 +1,4 @@
-# SNX Limit Orders
+# SNX Limit Orders (Work In Progress)
 
 ## Summary
 We propose a trustless architecture for adding limit orders functionality to the Synthetix Exchange that would not require any changes to the core contracts.
