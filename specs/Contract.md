@@ -3,10 +3,32 @@
  - The following specifications use syntax from Solidity `0.6.4` (or above)
  - In order for this contract to be able to access your SNX tokens, you must approve this contract for each token individually using the ERC20 `approve()` function. We recommend a max uint (`2^256 - 1`) approval amount.
 
+## Structs
+
+### LimitOrder
+
+```js
+struct LimitOrder {
+    address submitter;
+    uint256 orderID;
+    bytes32 sourceCurrencyKey;
+    uint256 sourceAmount;
+    bytes32 destinationCurrencyKey;
+    uint256 minDestinationAmount;
+    uint256 maxGasPrice;
+    uint256 weiDeposit;
+}
+```
+
 ## Public Variables
 
-TODO: Add `orders` mapping. uint OrderID => Order Struct
+### Orders Mapping
 
+A mapping from an orderID to a LimitOrder struct. The orderID is globally sequential and is iterated using a global private variable.
+
+```js
+mapping (uint256 => LimitOrder) public orders;
+```
 ## Methods
 
 ### newOrder
@@ -56,6 +78,16 @@ If the output destination amount is larger than or equal to the order's `minDest
 
 If the output destination amount is smaller than the order's `minDestinationAmount`, the transaction reverts.
 
+### getAllExecutableOrders
+
+``` js
+function getAllExecutableOrders() public view returns (uint256[] orderIDs);
+```
+
+This view function iterates over each `orderID` in the `orders` mapping and returns the IDs of all orders that are currently executable. An order is executable if its `minDestinationPrice` is larger than or equal to the latest price published by the Synthetix oracle.
+
+This utlity function is meant to be called by a Limit Order Execution Service on each new Ethereum block in order to collect new limit orders that can be immediately executed on this contract via the `executeOrder` function.
+
 ## Events
 
 ### Order
@@ -77,7 +109,7 @@ This event is emitted on each cancelled order. It's primary purpose is to alert 
 ### Execute
 
 ``` js
-event Execute(uint indexed orderID)
+event Execute(uint indexed orderID, address executor)
 ```
 
 This event is emitted on each successfully executed order. It's primary purpose is to alert node operators that a previously submitted order should no longer be watched.
