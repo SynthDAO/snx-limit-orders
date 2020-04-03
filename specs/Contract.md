@@ -84,7 +84,7 @@ If the output destination amount is smaller than the order's `minDestinationAmou
 function getAllExecutableOrders() public view returns (uint256[] orderIDs);
 ```
 
-This view function iterates over each `orderID` in the `orders` mapping and returns the IDs of all orders that are currently executable. An order is executable if its `minDestinationPrice` is larger than or equal to the latest price published by the Synthetix oracle.
+This view function iterates over each `orderID` in the `orders` mapping and returns the IDs of all orders that are currently executable. An order is executable if its `minDestinationAmount` is larger than or equal to the amount swapable under the latest price published by the Synthetix oracle.
 
 This utlity function is meant to be called by a Limit Order Execution Service on each new Ethereum block in order to collect new limit orders that can be immediately executed on this contract via the `executeOrder` function.
 
