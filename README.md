@@ -13,7 +13,7 @@ While limit orders can be trivial to implement in the case of centralized exchan
 ## Specification
 
 * [SynthLimitOrder Solidity Contract](specs/Contract.md)
-* [Limit Order Execution Service](specs/Service.md)
+* [Limit Order Execution Node](specs/Node.md)
 * [Client-side Javascript Library](specs/Library.md)
 
 
