@@ -39,7 +39,7 @@ function newOrder(bytes32 sourceCurrencyKey, uint sourceAmount, bytes32 destinat
 
 This function allows a `msg.sender` who has already given this contract an allowance of `sourceCurrencyKey` to submit a new limit order.
 
-1. Transfers `sourceAmount` of the `sourceCurrencyKey` Synth from the `msg.owner` to this contract via `transferFrom`.
+1. Transfers `sourceAmount` of the `sourceCurrencyKey` Synth from the `msg.sender` to this contract via `transferFrom`.
 2. Adds a new limit order to the `orders` mapping that can only execute on Synthtix exchange if the returned destination amount is more than or equal to `minDestinationAmount`.
 3. Requires a deposited `msg.value` to be more than the `executionFee` in order to refund node operators for their exact gas wei cost in addition to the `executionFee` amount. The remainder is transferred back to the user at the end of the trade.
 4. Emits an `Order` event for node operators including order data and `orderID`.
