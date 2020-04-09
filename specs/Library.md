@@ -18,7 +18,7 @@ The library must allow a simple interface to the following operations:
 ``` js
 const instance = new SynthLimitOrder(ethereumProvider)
 ```
-The library must expose a `SynthLimitOrder` class. The user must instantiates a class instance by passing a valid ethereum provider with signing capabilities (e.g. Metamask) to the constructor.
+The library must expose a `SynthLimitOrder` class. The user instantiates a class instance by passing a valid ethereum provider with signing capabilities (e.g. Metamask) to the constructor.
 
 ### submitOrder
 

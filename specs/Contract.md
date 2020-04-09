@@ -71,7 +71,7 @@ If the output destination amount is larger than or equal to the order's `minDest
 1. The output amount is forwarded to the order submitter's address. 
 2. This transaction's submitter address is refunded for this transaction's gas cost + the `executionFee` amount from the user's wei deposit.
 3. The remainder of the wei deposit is forwarded to the order submitter's address
-4. `Execute` event is emitted for node operators including the `orderID`
+4. `Execute` event is emitted with the `orderID` for node operators 
 
 If the output destination amount is smaller than the order's `minDestinationAmount`, the transaction reverts.
 
