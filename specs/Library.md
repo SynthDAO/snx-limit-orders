@@ -23,13 +23,13 @@ The library must expose a `SynthLimitOrder` class. The user must instantiates a 
 ### submitOrder
 
 ``` js
-const orderID = await instance.submitOrder({           // Input types:
+const orderID = await instance.submitOrder({
     sourceCurrencyKey,           // bytes32 string
     sourceAmount,                // base unit string amount
     destinationCurrencyKey,      // bytes32 string
     minDestinationAmount,        // base unit string amount
-    maxGasPrice,                 // wei string amount
-    weiDeposit                   // wei string amount
+    weiDeposit,                  // wei string amount
+    executionFee                 // wei string amount
 })
 ```
 This method allows the user to submit a new limit order on the contract by calling the `newOrder` contract function.
@@ -63,8 +63,8 @@ interface Order {
     sourceAmount: string;
     destinationCurrencyKey: string;
     minDestinationAmount: string;
-    maxGasPrice: string;
     weiDeposit:string;
+    executionFee:string;
 }
 ```
 

@@ -6,7 +6,7 @@ The Limit Order Execution Node is an always-running node that collects `newOrder
 
 ## Requirements
 * The node collects executable limit orders as soon as their execution conditions are met.
-* The node only executes orders that can refund the entire gas cost of the transaction.
+* The node only executes orders that can refund the entire gas cost of the transaction in addition to an `executionFee` equal to or larger than a pre-configured minimum.
 * The node attempts to re-execute failing order transactions as soon as their order conditions are met again
 
 ## Components
@@ -23,7 +23,7 @@ If any executable limit orders are found, they are passed to the Execution Servi
 
 In order to determine whether an `orderID` should be immediately executed, the service follows the following steps:
 - Checks a local database for any existing pending transactions previously submitted by this executing the same `orderID`. If a record is found, this order will not be submitted.
-- Attempts to estimate gas cost for calling the `executeOrder` contract function while passing the `orderID`. If the attempt fails, this is likely because the order's deposited `wei` funds are insufficient to fully recover the gas cost of this transaction.
+- Attempts to estimate gas cost for calling the `executeOrder` contract function while passing the `orderID`. If the attempt fails, this is likely because the order's deposited `wei` funds are insufficient to fully recover the gas cost of this transaction + the `executionFee`.
 - Checks if the node wallet address owns sufficient `wei` to cover this transaction cost. If the balance is insufficient, an email notification must be sent to the node operator.
 
 After the checks have passed, the order is executed:

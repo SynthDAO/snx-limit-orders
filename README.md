@@ -22,12 +22,6 @@ While limit orders can be trivial to implement in the case of centralized exchan
 ### Limit Order Execution Nodes
 By allowing anyone to run “limit order execution nodes” and compete for limit order execution fees, we achieve order execution reliability and censorship-resistance through permissionless-ness. These are especially important in the context of limit orders, where censorship or execution delays might cause trading losses.
 
-### Lack of Incentive
-In our current contract design, we intentionally avoid adding an incentive (e.g. via executor commission). At the end of a limit order execution, the executor is refunded by the order submitter for exactly the amount of gas they spent on their transaction.
-This design decision mitigates a potential [Thundering Herd Problem](https://en.wikipedia.org/wiki/Thundering_herd_problem).
-
-Since the cost of running the node is trivial, we expect the Synthetix team to be well incentivized run it as a public good on behalf of the community. In a case where Synthetix teams shuts down the node for some reason, the community is able to run its own node.
-
 ### Upgradability
 The `SynthLimitOrder` contract architecture does not include any upgradability or admin modules. If a future contract upgrade becomes available, each user is required to cancel any pending limit orders individually and move them to the new contract. In a different case where the Synthetix core contracts are upgraded, a new instance of the contract would be deployed to point at the new Synthetix contracts addresses.
 

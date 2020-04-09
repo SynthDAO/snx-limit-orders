@@ -15,8 +15,8 @@ struct LimitOrder {
     uint256 sourceAmount;
     bytes32 destinationCurrencyKey;
     uint256 minDestinationAmount;
-    uint256 maxGasPrice;
     uint256 weiDeposit;
+    uint256 executionFee;
 }
 ```
 
@@ -34,17 +34,16 @@ mapping (uint256 => LimitOrder) public orders;
 ### newOrder
 
 ``` js
-function newOrder(bytes32 sourceCurrencyKey, uint sourceAmount, bytes32 destinationCurrencyKey, uint minDestinationAmount, uint maxGasPrice) public returns (uint orderID);
+function newOrder(bytes32 sourceCurrencyKey, uint sourceAmount, bytes32 destinationCurrencyKey, uint minDestinationAmount, uint executionFee) public returns (uint orderID);
 ```
 
 This function allows a `msg.sender` who has already given this contract an allowance of `sourceCurrencyKey` to submit a new limit order.
 
 1. Transfers `sourceAmount` of the `sourceCurrencyKey` Synth from the `msg.owner` to this contract via `transferFrom`.
 2. Adds a new limit order to the `orders` mapping that can only execute on Synthtix exchange if the returned destination amount is more than or equal to `minDestinationAmount`.
-3. Requires a deposited `msg.value` to be more than 0 in order to refund node operators for their exact gas wei cost. The remainder is transfereed back to the user at the end of the trade.
-4. Requires the node executing this order in the future to use a gas price less than or equal to `maxGasPrice`.
-5. Emits an `Order` event for node operators including order data and `orderID`.
-6. Returns (globally sequential) `orderID`
+3. Requires a deposited `msg.value` to be more than the `executionFee` in order to refund node operators for their exact gas wei cost in addition to the `executionFee` amount. The remainder is transferred back to the user at the end of the trade.
+4. Emits an `Order` event for node operators including order data and `orderID`.
+5. Returns (globally sequential) `orderID`
 
 ### cancelOrder
 
@@ -65,14 +64,12 @@ function executeOrder(uint orderID) public;
 ```
 
 This function can be called by anyone using any valid orderID as long as the conditions are met.
-
-1. Requires `tx.gasprice` to be smaller or equal to the order's `maxGasPrice`.
-2. Attempts to execute the user's order on the Synthetix exchange.
+It attempts to execute the user's order on the Synthetix exchange.
 
 If the output destination amount is larger than or equal to the order's `minDestinationAmount`:
 
 1. The output amount is forwarded to the order submitter's address. 
-2. This transaction's submitter address is refunded for this transaction's gas cost from the user's wei deposit
+2. This transaction's submitter address is refunded for this transaction's gas cost + the `executionFee` amount from the user's wei deposit.
 3. The remainder of the wei deposit is forwarded to the order submitter's address
 4. `Execute` event is emitted for node operators including the `orderID`
 
@@ -93,7 +90,7 @@ This utlity function is meant to be called by a Limit Order Execution Node on ea
 ### Order
 
 ``` js
-event Order(uint indexed orderID, address indexed submitter, bytes32 sourceCurrencyKey, uint sourceAmount, bytes32 destinationCurrencyKey, uint minDestinationAmount, uint maxGasPrice, uint weiDeposit)
+event Order(uint indexed orderID, address indexed submitter, bytes32 sourceCurrencyKey, uint sourceAmount, bytes32 destinationCurrencyKey, uint minDestinationAmount uint executionFee, uint weiDeposit)
 ```
 
 This event is emitted on each new submitted order. It's primary purpose is to alert node operators of newly submitted orders in realtime.
