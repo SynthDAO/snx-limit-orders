@@ -1,7 +1,8 @@
 # SynthLimitOrder Contract Spec
 *NOTES*:
  - The following specifications use syntax from Solidity `0.6.4` (or above)
- - In order for this contract to be able to access your SNX tokens, you must approve this contract for each token individually using the ERC20 `approve()` function. We recommend a max uint (`2^256 - 1`) approval amount.
+ - In order for this contract to be able to access your SNX tokens, you must approve this contract for each token individually using the ERC20 approve() function. We recommend a max uint (2^256 - 1) approval amount.
+ - In order for limit orders to execute successfully, you must approve this contract to exchange on your behalf using Synthetix `DelegateApprovals.approveExchangeOnBehalf()`
 
 ## Structs
 
@@ -64,16 +65,16 @@ function executeOrder(uint orderID) public;
 ```
 
 This function can be called by anyone using any valid orderID as long as the conditions are met.
-It attempts to execute the user's order on the Synthetix exchange.
+It attempts to execute the user's using `Synthetix.exchangeOnBehalf()`.
 
-If the output destination amount is larger than or equal to the order's `minDestinationAmount`:
+If the amount received is larger than or equal to the order's `minDestinationAmount`:
 
-1. The output amount is forwarded to the order submitter's address. 
+1. The amount received is forwarded to the order submitter's address. 
 2. This transaction's submitter address is refunded for this transaction's gas cost + the `executionFee` amount from the user's wei deposit.
 3. The remainder of the wei deposit is forwarded to the order submitter's address
 4. `Execute` event is emitted with the `orderID` for node operators 
 
-If the output destination amount is smaller than the order's `minDestinationAmount`, the transaction reverts.
+If the amount received is smaller than the order's `minDestinationAmount`, the transaction reverts.
 
 ### getAllExecutableOrders
 
@@ -81,7 +82,7 @@ If the output destination amount is smaller than the order's `minDestinationAmou
 function getAllExecutableOrders() public view returns (uint256[] orderIDs);
 ```
 
-This view function iterates over each `orderID` in the `orders` mapping and returns the IDs of all orders that are currently executable. An order is executable if its `minDestinationAmount` is larger than or equal to the amount swapable under the latest price published by the Synthetix oracle.
+This view function iterates over each `orderID` in the `orders` mapping and returns the IDs of all orders that are currently executable. An order is executable if its `minDestinationAmount` is larger than or equal to the amount receivable under the latest price published by the Synthetix oracle.
 
 This utlity function is meant to be called by a Limit Order Execution Node on each new Ethereum block in order to collect new limit orders that can be immediately executed on this contract via the `executeOrder` function.
 
