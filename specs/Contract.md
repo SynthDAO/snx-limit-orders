@@ -1,8 +1,8 @@
 # SynthLimitOrder Contract Spec
 *NOTES*:
  - The following specifications use syntax from Solidity `0.6.4` (or above)
- - In order for this contract to be able to access your SNX tokens, you must approve this contract for each token individually using the ERC20 approve() function. We recommend a max uint (2^256 - 1) approval amount.
- - In order for limit orders to execute successfully, you must approve this contract to exchange on your behalf using Synthetix `DelegateApprovals.approveExchangeOnBehalf()`
+ - In order for this contract to be able to access user SNX tokens, they must approve this contract for each token individually using the ERC20 approve() function. We recommend a max uint (2^256 - 1) approval amount.
+ - In order for limit orders to execute successfully, users must approve this contract to exchange on their behalf using Synthetix `DelegateApprovals.approveExchangeOnBehalf()`
 
 ## Structs
 
