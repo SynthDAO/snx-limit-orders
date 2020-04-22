@@ -12,7 +12,7 @@ While limit orders can be trivial to implement in the case of centralized exchan
 
 ## Specification
 
-* [SynthLimitOrder Solidity Contract](specs/Contract.md)
+* [SynthLimitOrder Solidity Contracts](specs/Contracts.md)
 * [Limit Order Execution Node](specs/Node.md)
 * [Client-side Javascript Library](specs/Library.md)
 
@@ -23,6 +23,4 @@ While limit orders can be trivial to implement in the case of centralized exchan
 By allowing anyone to run “limit order execution nodes” and compete for limit order execution fees, we achieve order execution reliability and censorship-resistance through permissionless-ness. These are especially important in the context of limit orders, where censorship or execution delays might cause trading losses.
 
 ### Upgradability
-Contract functions that interact with any Synthetix contract fetch the current address of the target contract from the Synthetix `AddressResolver` contract on each transaction. This ensures that our contract is always in sync with the latest contracts deployed by Synthetix.
-
-Additionally, submitting and executing orders on the `SynthLimitOrder` contract can be temporarily or permanently paused by a preset admin key in the event where the `AddressResolver` becomes deprecated or the contract interface of the target contracts is modified by the Synthetix team. In either of these cases, a new version of this contract should be deployed with a new address to replace it. Each user would be required to cancel their active orders and resubmit them on the new contract. Only the `cancelOrder` contract function is not pausable in order to allow users to withdraw any stored funds while the contract is paused.
+We use an upgradable proxy pattern in order to allow a present owner address to upgrade the core implementation contract at any time. That said, the upgrades are restricted by a timelock duration after an upgrade is initiated by the owner. In this duration, all order submitters are able to cancel any active orders if they wish to opt-out of the new implementation. This restriction enables traders to act in the unlikely scenario where the owner turns malicious or becomes compromised and attempts to create an upgrade that puts their funds at risk.
