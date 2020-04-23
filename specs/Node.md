@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The Limit Order Execution Node is an always-running node that collects `newOrder` events from the `SynthLimitOrder` contract and executes each order when its `minDestinationAmount` condition is met by the Synthetix oracle (Synthetix `ExchangeRates.sol` contract).
+The Limit Order Execution Node is an always-running node that collects `NewOrder` events from the proxy contract and executes each order when its `minDestinationAmount` condition is met by the Synthetix oracle (Synthetix `ExchangeRates.sol` contract).
 
 ## Requirements
 * The node collects executable limit orders as soon as their execution conditions are met.
@@ -13,9 +13,7 @@ The Limit Order Execution Node is an always-running node that collects `newOrder
 
 ### Watcher Service
 
-This service listens for new Ethereum blocks in realtime. On each new block, the service calls the `SynthLimitOrder` contract's `getAllExecutableOrders` view function. This function will return an array of `orderID`s that are immediately executable by the service. This array also excludes cancelled or previously executed limit orders.
-
-Alternatively, the service can also use the `Order` contract event to subscribe to newly submitted limit orders and check their validity using the `orders` mapping.
+This service listens for new Ethereum blocks in realtime. On each new block, the service calls the Proxy contract's `getAllExecutableOrders` view function. This function will return an array of `orderID`s that are immediately executable by the service. This array also excludes cancelled or previously executed limit orders.
 
 If any executable limit orders are found, they are passed to the Execution Service
 

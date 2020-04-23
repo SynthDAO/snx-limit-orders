@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This library is proposed in order to provide a simple Javascript interface to the limit order functionality of the `SynthLimitOrder` contract.
+This library is proposed in order to provide a simple Javascript interface to the limit order functionality of the Synthetix limit order contract.
 
 ## Requirements
 The library must allow a simple interface to the following operations:
@@ -52,19 +52,19 @@ It returns a `Promise<void>` as soon as the transaction is confirmed.
 ``` js
 const order = await instance.getOrder(orderID)
 ```
-This method allows the user to query the contract for a specific order number by querying the `orders` contract mapping.
+This method allows the user to query the contract for a specific order number by querying the `StateStorage` contract `getOrder` function.
 
 It returns a promise that resolves with an `Order` object:
 ```ts
 interface Order {
     submitter: string;
-    orderID: string,
     sourceCurrencyKey: string;
     sourceAmount: string;
     destinationCurrencyKey: string;
     minDestinationAmount: string;
     weiDeposit:string;
     executionFee:string;
+    active:boolean;
 }
 ```
 
