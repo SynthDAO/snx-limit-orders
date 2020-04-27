@@ -23,4 +23,4 @@ While limit orders can be trivial to implement in the case of centralized exchan
 By allowing anyone to run “limit order execution nodes” and compete for limit order execution fees, we achieve order execution reliability and censorship-resistance through permissionless-ness. These are especially important in the context of limit orders, where censorship or execution delays might cause trading losses.
 
 ### Upgradability
-We use an upgradable proxy pattern in order to allow a present owner address to upgrade the core implementation contract at any time. That said, the upgrades are restricted by a timelock duration after an upgrade is initiated by the owner. In this duration, all order submitters are able to cancel any active orders if they wish to opt-out of the new implementation. This restriction enables traders to act in the unlikely scenario where the owner turns malicious or becomes compromised and attempts to create an upgrade that puts their funds at risk.
+We use an upgradable proxy pattern in order to allow a present owner address to upgrade the core implementation contract at any time.
