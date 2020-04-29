@@ -38,6 +38,17 @@ This method also automatically attempts to sign an ERC20 approve transaction for
 
 It returns a `Promise<string>` as soon as the transaction is confirmed where the string contains the new order ID.
 
+### withdraw
+
+``` js
+await instance.withdraw()
+```
+This method allows the user to withdraw funds from all executed orders on the contract that have passed the fee reclamantion duration.
+
+The method fetches all historical `Executed` events from the contract filtered by the user's address as the `submitter` and queries each order's current state using `StateStorage.getOrder`. If the order's `executed` property is `true` and `executedTimestamp + 3 minutes` is larger than the current timestamp, the order is is added to the array of order IDs sent to the Proxy contract's `withdrawOrders` function.
+
+It returns a `Promise<void>` as soon as the transaction is confirmed.
+
 ### cancelOrder
 
 ``` js
