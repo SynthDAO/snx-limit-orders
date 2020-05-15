@@ -32,7 +32,7 @@ contract StateStorage {
         exchangeRates = exchangeRatesContract;
     }
 
-    function createOrder(address submitter, bytes32 sourceCurrencyKey, uint sourceAmount, bytes32 destinationCurrencyKey, uint minDestinationAmount, uint weiDeposit, uint executionFee, bool executed) onlyProxy public returns (uint orderID) {
+    function createOrder(address submitter, bytes32 sourceCurrencyKey, uint sourceAmount, bytes32 destinationCurrencyKey, uint minDestinationAmount, uint weiDeposit, uint executionFee, uint256 executionTimestamp, uint256 destinationAmount, bool executed) onlyProxy public returns (uint orderID) {
         latestID++;
         orders[latestID] = LimitOrder(
             submitter,
@@ -42,11 +42,27 @@ contract StateStorage {
             minDestinationAmount,
             weiDeposit,
             executionFee,
-            0,
-            0,
+            executionTimestamp,
+            destinationAmount,
             executed
         );
         return latestID;
+    }
+
+    function setOrder(uint orderId, address submitter, bytes32 sourceCurrencyKey, uint sourceAmount, bytes32 destinationCurrencyKey, uint minDestinationAmount, uint weiDeposit, uint executionFee, uint executionTimestamp, uint destinationAmount, bool executed) onlyProxy public {
+        require(orderId <= latestID, "This order does not exist");
+        orders[latestID] = LimitOrder(
+            submitter,
+            sourceCurrencyKey,
+            sourceAmount,
+            destinationCurrencyKey,
+            minDestinationAmount,
+            weiDeposit,
+            executionFee,
+            executionTimestamp,
+            destinationAmount,
+            executed
+        );
     }
 
     function getOrder(uint256 orderID) view public returns (address submitter, bytes32 sourceCurrencyKey, uint sourceAmount, bytes32 destinationCurrencyKey, uint minDestinationAmount, uint weiDeposit, uint executionFee, uint executionTimestamp, uint destinationAmount, bool executed) {
@@ -63,6 +79,11 @@ contract StateStorage {
             order.destinationAmount,
             order.executed
         );
+    }
+
+    function deleteOrder(uint256 orderId) onlyProxy public {
+        require(orderId <= latestID, "This order does not exist");
+        delete orders[orderId];
     }
 
 }
