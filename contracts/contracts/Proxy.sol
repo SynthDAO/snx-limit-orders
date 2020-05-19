@@ -5,8 +5,8 @@ import './StateStorage.sol';
 
 contract Proxy {
 
-    ImplementationResolver internal resolver;
     StateStorage internal stateStorage;
+    ImplementationResolver internal resolver;
 
     constructor(address resolverAddress, address stateStorageAddress) public {
         resolver = ImplementationResolver(resolverAddress);
