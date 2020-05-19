@@ -12,7 +12,7 @@ describe("StateStorage", function() {
     const synthetixContract = "0x0000000000000000000000000000000000000001"
     const exchangeRatesContract = "0x0000000000000000000000000000000000000002"
     const StateStorage = await ethers.getContractFactory("StateStorage");
-    const stateStorage = await StateStorage.deploy(await proxy.getAddress(), synthetixContract, exchangeRatesContract);
+    const stateStorage = await StateStorage.deploy(synthetixContract, exchangeRatesContract);
     await stateStorage.deployed();
     expect(await stateStorage.synthetix()).to.equal(synthetixContract);
     expect(await stateStorage.exchangeRates()).to.equal(exchangeRatesContract);
@@ -21,8 +21,9 @@ describe("StateStorage", function() {
   it("Should allow only the proxy address to createOrder", async function() {
     const [proxy, addr1] = await ethers.getSigners();
     const StateStorage = await ethers.getContractFactory("StateStorage");
-    const stateStorage = await StateStorage.deploy(await proxy.getAddress(), addressZero, addressZero);
+    const stateStorage = await StateStorage.deploy(addressZero, addressZero);
     await stateStorage.deployed();
+    await stateStorage.setProxy(await proxy.getAddress());
     await stateStorage.connect(proxy).createOrder(addressZero, hashZero, 1, hashZero, 1, 1, 1, 0, 0, false)
     expect(await stateStorage.latestID()).to.equal(1);
     try {
@@ -36,8 +37,9 @@ describe("StateStorage", function() {
   it("Should allow anyone to getOrder", async function() {
     const [proxy, addr1] = await ethers.getSigners();
     const StateStorage = await ethers.getContractFactory("StateStorage");
-    const stateStorage = await StateStorage.deploy(await proxy.getAddress(), addressZero, addressZero);
+    const stateStorage = await StateStorage.deploy(addressZero, addressZero);
     await stateStorage.deployed();
+    await stateStorage.setProxy(await proxy.getAddress());
     const submitter = "0x0000000000000000000000000000000000000001"
     await stateStorage.connect(proxy).createOrder(submitter, hashZero, 1, hashZero, 1, 1, 1, 0, 0, false)
     expect((await stateStorage.connect(addr1).getOrder(1))[0]).to.equal(submitter);
@@ -46,8 +48,9 @@ describe("StateStorage", function() {
   it("Should allow only the proxy address to setOrder", async function() {
     const [proxy, addr1] = await ethers.getSigners();
     const StateStorage = await ethers.getContractFactory("StateStorage");
-    const stateStorage = await StateStorage.deploy(await proxy.getAddress(), addressZero, addressZero);
+    const stateStorage = await StateStorage.deploy(addressZero, addressZero);
     await stateStorage.deployed();
+    await stateStorage.setProxy(await proxy.getAddress());
     await stateStorage.connect(proxy).createOrder(addressZero, hashZero, 1, hashZero, 1, 1, 1, 0, 0, false)
     const addressOne = "0x0000000000000000000000000000000000000001"
     await stateStorage.connect(proxy).setOrder(await stateStorage.latestID(), addressOne, hashZero, 1, hashZero, 1, 1, 1, 0, 0, false)
@@ -63,8 +66,9 @@ describe("StateStorage", function() {
   it("Should allow only the proxy address to deleteOrder", async function() {
     const [proxy, addr1] = await ethers.getSigners();
     const StateStorage = await ethers.getContractFactory("StateStorage");
-    const stateStorage = await StateStorage.deploy(await proxy.getAddress(), addressZero, addressZero);
+    const stateStorage = await StateStorage.deploy(addressZero, addressZero);
     await stateStorage.deployed();
+    await stateStorage.setProxy(await proxy.getAddress());
     const addressOne = "0x0000000000000000000000000000000000000001"
     await stateStorage.connect(proxy).createOrder(addressOne, hashZero, 1, hashZero, 1, 1, 1, 0, 0, false)
     await stateStorage.connect(proxy).deleteOrder(await stateStorage.latestID())

@@ -1,13 +1,16 @@
 pragma solidity ^0.4.25;
 
 import './ImplementationResolver.sol';
+import './StateStorage.sol';
 
 contract Proxy {
 
     ImplementationResolver internal resolver;
+    StateStorage internal stateStorage;
 
-    constructor(address resolverAddress) public {
+    constructor(address resolverAddress, address stateStorageAddress) public {
         resolver = ImplementationResolver(resolverAddress);
+        stateStorage = StateStorage(stateStorageAddress);
     }
 
     function() external payable {

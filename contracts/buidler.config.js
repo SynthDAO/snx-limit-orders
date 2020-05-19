@@ -1,4 +1,7 @@
 usePlugin("@nomiclabs/buidler-waffle");
+usePlugin("@nomiclabs/buidler-solpp");
+
+const config = require("@nomiclabs/buidler/config");
 
 // This is a sample Buidler task. To learn how to create your own go to
 // https://buidler.dev/guides/create-task.html
@@ -19,4 +22,12 @@ module.exports = {
   solc: {
     version: "0.4.25",
   },
+  solpp:{
+    defs:{
+      async STATE_STORAGE_ADDRESS () {
+        console.log(await ethers.getContract("StateStorage").address)
+        return config.StateStorageAddress;
+      }
+    }
+  }
 };

@@ -26,10 +26,14 @@ contract StateStorage {
         bool executed;
     }
 
-    constructor(address proxyContract, address synthetixContract, address exchangeRatesContract) public {
-        proxy = proxyContract;
+    constructor(address synthetixContract, address exchangeRatesContract) public {
         synthetix = synthetixContract;
         exchangeRates = exchangeRatesContract;
+    }
+
+    function setProxy(address proxyContract) public {
+        require(proxy == address(0), "Proxy contract already set");
+        proxy = proxyContract;
     }
 
     function createOrder(address submitter, bytes32 sourceCurrencyKey, uint sourceAmount, bytes32 destinationCurrencyKey, uint minDestinationAmount, uint weiDeposit, uint executionFee, uint256 executionTimestamp, uint256 destinationAmount, bool executed) onlyProxy public returns (uint orderID) {
@@ -66,7 +70,7 @@ contract StateStorage {
     }
 
     function getOrder(uint256 orderID) view public returns (address submitter, bytes32 sourceCurrencyKey, uint sourceAmount, bytes32 destinationCurrencyKey, uint minDestinationAmount, uint weiDeposit, uint executionFee, uint executionTimestamp, uint destinationAmount, bool executed) {
-        LimitOrder order = orders[orderID];
+        LimitOrder memory order = orders[orderID];
         return (
             order.submitter,
             order.sourceCurrencyKey,
