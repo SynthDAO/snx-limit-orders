@@ -10,4 +10,8 @@ contract Synth {
         return true;
     }
 
+    function transfer(address, uint) public returns (bool) {
+        return true;
+    }
+
 }
