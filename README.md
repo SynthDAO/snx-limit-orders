@@ -1,3 +1,5 @@
+![Contracts Tests](https://github.com/mosendo/snx-limit-orders/workflows/Contracts%20Tests/badge.svg) [![codecov](https://codecov.io/gh/mosendo/snx-limit-orders/branch/master/graph/badge.svg?token=1NMM3S22OB)](https://codecov.io/gh/mosendo/snx-limit-orders)
+
 # SNX Limit Orders (Work In Progress)
 
 ## Summary
