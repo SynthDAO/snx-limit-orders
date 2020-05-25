@@ -4,7 +4,6 @@ contract StateStorage {
 
     address proxy;
     address public synthetix;
-    address public exchangeRates;
     uint256 public latestID;
     mapping (uint256 => LimitOrder) orders;
 
@@ -26,9 +25,8 @@ contract StateStorage {
         bool executed;
     }
 
-    constructor(address synthetixContract, address exchangeRatesContract) public {
+    constructor(address synthetixContract) public {
         synthetix = synthetixContract;
-        exchangeRates = exchangeRatesContract;
     }
 
     function setProxy(address proxyContract) public {
@@ -54,7 +52,7 @@ contract StateStorage {
     }
 
     function setOrder(uint orderId, address submitter, bytes32 sourceCurrencyKey, uint sourceAmount, bytes32 destinationCurrencyKey, uint minDestinationAmount, uint weiDeposit, uint executionFee, uint executionTimestamp, uint destinationAmount, bool executed) onlyProxy public {
-        require(orderId <= latestID, "This order does not exist");
+        require(orderId <= latestID && orderId > 0, "This order does not exist");
         orders[latestID] = LimitOrder(
             submitter,
             sourceCurrencyKey,

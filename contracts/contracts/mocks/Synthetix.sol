@@ -11,7 +11,7 @@ contract Synthetix {
     }
 
     function exchange(bytes32, uint, bytes32) external returns (uint) {
-        return 0;
+        return 2;
     }
 
 }

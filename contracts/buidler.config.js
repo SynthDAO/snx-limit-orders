@@ -1,5 +1,4 @@
 usePlugin("@nomiclabs/buidler-waffle");
-usePlugin("@nomiclabs/buidler-solpp");
 
 const config = require("@nomiclabs/buidler/config");
 
@@ -24,9 +23,8 @@ module.exports = {
   },
   solpp:{
     defs:{
-      async STATE_STORAGE_ADDRESS () {
-        console.log(await ethers.getContract("StateStorage").address)
-        return config.StateStorageAddress;
+      test () {
+        return config.test === true;
       }
     }
   }
