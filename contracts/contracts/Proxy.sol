@@ -1,19 +1,26 @@
 pragma solidity ^0.4.25;
 
 import './ImplementationResolver.sol';
-import './StateStorage.sol';
 
 contract Proxy {
 
-    StateStorage internal stateStorage;
-    ImplementationResolver internal resolver;
+    // https://eips.ethereum.org/EIPS/eip-1967
+    bytes32 private constant implementationResolverSlot = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
 
-    constructor(address resolverAddress, address stateStorageAddress) public {
-        resolver = ImplementationResolver(resolverAddress);
-        stateStorage = StateStorage(stateStorageAddress);
+    constructor(address resolverAddress) public {
+        bytes32 slot = implementationResolverSlot;
+        assembly {
+            sstore(slot, resolverAddress)
+        }
     }
 
     function() external payable {
+        bytes32 slot = implementationResolverSlot;
+        address resolverAddress;
+        assembly {
+            resolverAddress := sload(slot)
+        }
+        ImplementationResolver resolver = ImplementationResolver(resolverAddress);
         address impl = resolver.getImplementation();
         assembly {
           let ptr := mload(0x40)

@@ -1,57 +1,91 @@
 pragma solidity ^0.4.25;
 
-import "./StateStorage.sol";
-
 interface ISynth {
-    function transferFrom(address, address, uint) public returns (bool);
-    function transfer(address, uint) public returns (bool);
+    function transferFrom(address, address, uint) external returns (bool);
+    function transfer(address, uint) external returns (bool);
 }
 
 interface ISynthetix {
-    function synths(bytes32) public returns (address);
+    function synths(bytes32) external returns (address);
     function exchange(bytes32, uint, bytes32) external returns (uint);
 }
 
 contract Implementation {
 
-    StateStorage internal stateStorage;
+    bool initialized;
+    ISynthetix synthetix;
+    uint withdrawalDelay;
+    uint256 public latestID;
+    mapping (uint256 => LimitOrder) public orders;
 
-    function newOrder(bytes32 sourceCurrencyKey, uint sourceAmount, bytes32 destinationCurrencyKey, uint minDestinationAmount, uint executionFee) payable public returns (uint orderID) {
+    struct LimitOrder {
+        address submitter;
+        bytes32 sourceCurrencyKey;
+        uint256 sourceAmount;
+        bytes32 destinationCurrencyKey;
+        uint256 minDestinationAmount;
+        uint256 weiDeposit;
+        uint256 executionFee;
+        uint256 executionTimestamp;
+        uint256 destinationAmount;
+        bool executed;
+    }
+
+    function initialize(address synthetixAddress, uint _withdrawalDelay) public {
+        require(initialized == false, "Already initialized");
+        initialized = true;
+        synthetix = ISynthetix(synthetixAddress);
+        withdrawalDelay = _withdrawalDelay;
+    }
+
+    function newOrder(bytes32 sourceCurrencyKey, uint sourceAmount, bytes32 destinationCurrencyKey, uint minDestinationAmount, uint executionFee) payable public returns (uint) {
         require(msg.value > 0, "wei deposit must be larger than 0");
         require(msg.value > executionFee, "wei deposit must be larger than executionFee");
-        ISynthetix synthetix = ISynthetix(stateStorage.synthetix());
         ISynth sourceSynth = ISynth(synthetix.synths(sourceCurrencyKey));
         require(sourceSynth.transferFrom(msg.sender, address(this), sourceAmount), "User allowance insufficient for transferFrom");
-        orderID = stateStorage.createOrder(msg.sender, sourceCurrencyKey, sourceAmount, destinationCurrencyKey, minDestinationAmount, msg.value, executionFee, 0, 0, false);
-        emit Order(orderID, msg.sender, sourceCurrencyKey, sourceAmount, destinationCurrencyKey, minDestinationAmount, executionFee, msg.value);
+        latestID++;
+        orders[latestID] = LimitOrder(
+            msg.sender,
+            sourceCurrencyKey,
+            sourceAmount,
+            destinationCurrencyKey,
+            minDestinationAmount,
+            msg.value,
+            executionFee,
+            0,
+            0,
+            false
+        );
+        emit Order(latestID, msg.sender, sourceCurrencyKey, sourceAmount, destinationCurrencyKey, minDestinationAmount, executionFee, msg.value);
+        return latestID;
     }
 
     function cancelOrder(uint orderID) public {
-        require(orderID <= stateStorage.latestID(), "Order does not exist");
-        (address submitter, bytes32 sourceCurrencyKey, uint sourceAmount, , , uint weiDeposit, , , , bool executed) = stateStorage.getOrder(orderID);
-        require(submitter == msg.sender, "This order was not submitted my the sender or already cancelled");
-        require(executed == false, "Order already executed");
-        ISynthetix synthetix = ISynthetix(stateStorage.synthetix());
-        ISynth sourceSynth = ISynth(synthetix.synths(sourceCurrencyKey));
-        require(sourceSynth.transfer(msg.sender, sourceAmount), "synth.transfer() failed");
-        msg.sender.transfer(weiDeposit);
-        stateStorage.deleteOrder(orderID);
+        require(orderID <= latestID, "Order does not exist");
+        LimitOrder storage order = orders[orderID];
+        require(order.submitter == msg.sender, "This order was not submitted my the sender or already cancelled");
+        require(order.executed == false, "Order already executed");
+        ISynth sourceSynth = ISynth(synthetix.synths(order.sourceCurrencyKey));
+        require(sourceSynth.transfer(msg.sender, order.sourceAmount), "synth.transfer() failed");
+        msg.sender.transfer(order.weiDeposit);
+        delete orders[orderID];
         emit Cancel(orderID);
     }
 
     function executeOrder(uint orderID) public {
         uint gasUsed = gasleft();
-        require(orderID <= stateStorage.latestID(), "Order does not exist");
-        (address submitter, bytes32 sourceCurrencyKey, uint sourceAmount, bytes32 destinationCurrencyKey, uint minDestinationAmount, uint weiDeposit, uint executionFee, , , bool executed) = stateStorage.getOrder(orderID);
-        require(executed == false, "Order already executed");
-        ISynthetix synthetix = ISynthetix(stateStorage.synthetix());
-        uint destinationAmount = synthetix.exchange(sourceCurrencyKey, sourceAmount, destinationCurrencyKey);
-        require(destinationAmount >= minDestinationAmount, "target price not reached");
-        stateStorage.setOrder(orderID, submitter, sourceCurrencyKey, sourceAmount, destinationCurrencyKey, minDestinationAmount, weiDeposit, executionFee, block.timestamp, destinationAmount, true);
+        require(orderID <= latestID, "Order does not exist");
+        LimitOrder storage order = orders[orderID];
+        require(order.executed == false, "Order already executed");
+        uint destinationAmount = synthetix.exchange(order.sourceCurrencyKey, order.sourceAmount, order.destinationCurrencyKey);
+        require(destinationAmount >= order.minDestinationAmount, "target price not reached");
+        order.executionTimestamp = block.timestamp;
+        order.destinationAmount = destinationAmount;
+        order.executed = true;
         emit Execute(orderID, msg.sender);
         gasUsed -= gasleft();
-        uint refund = ((gasUsed + 33459) * tx.gasprice) + executionFee; // magic number generated using tests
-        require(weiDeposit >= refund, "Insufficient weiDeposit");
+        uint refund = ((gasUsed + 35058) * tx.gasprice) + order.executionFee; // magic number generated using tests
+        require(order.weiDeposit >= refund, "Insufficient weiDeposit");
         msg.sender.transfer(refund);
     }
 

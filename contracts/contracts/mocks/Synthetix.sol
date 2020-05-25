@@ -6,7 +6,7 @@ contract Synthetix {
 
     mapping(bytes32 => Synth) public synths;
 
-    constructor (address testSynth) {
+    constructor (address testSynth) public {
         synths[0x0000000000000000000000000000000000000000000000000000000000000000] = Synth(testSynth);
     }
 
