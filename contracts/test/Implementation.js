@@ -87,4 +87,23 @@ describe("Implementation", function() {
     expect(afterBalance.sub(1).sub(beforeBalance).toNumber()).to.equal(0);
   });
 
+  it("Should allow user to withdrawOrders", async function() {
+    const { proxy, signer, addr1 } = await deployContracts()
+    await proxy.connect(signer).newOrder(hashZero, 1, hashOne, 1, 1, {
+      value: ethers.utils.parseEther('1'),
+    });
+    await proxy.connect(addr1).executeOrder(1, {
+      gasPrice:1
+    });
+    await proxy.connect(signer).newOrder(hashZero, 1, hashOne, 1, 1, {
+      value: ethers.utils.parseEther('1'),
+    });
+    await proxy.connect(addr1).executeOrder(2, {
+      gasPrice:1
+    });
+    await proxy.withdrawOrders([1,2]);
+    expect(((await proxy.orders(1)).submitter)).to.equal(addressZero);
+    expect(((await proxy.orders(2)).submitter)).to.equal(addressZero);
+  });
+
 })

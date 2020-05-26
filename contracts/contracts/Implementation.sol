@@ -84,13 +84,28 @@ contract Implementation {
         order.executed = true;
         emit Execute(orderID, msg.sender);
         gasUsed -= gasleft();
-        uint refund = ((gasUsed + 35058) * tx.gasprice) + order.executionFee; // magic number generated using tests
+        uint refund = ((gasUsed + 40919) * tx.gasprice) + order.executionFee; // magic number generated using tests
         require(order.weiDeposit >= refund, "Insufficient weiDeposit");
+        order.weiDeposit -= refund;
         msg.sender.transfer(refund);
+    }
+
+    function withdrawOrders(uint[] orderIDs) public {
+        for (uint i = 0; i < orderIDs.length; i++) {
+            LimitOrder order = orders[orderIDs[i]];
+            require(msg.sender == order.submitter, "Not order submitter");
+            require(order.executed == true, "Order not yet executed");
+            require((order.executionTimestamp + withdrawalDelay) < block.timestamp, "Fee reclamation window not passed");
+            ISynth destinationSynth = ISynth(synthetix.synths(order.destinationCurrencyKey));
+            require(destinationSynth.transfer(msg.sender, order.destinationAmount), "synth.transfer() failed");
+            emit Withdraw(orderIDs[i], order.submitter);
+            delete orders[orderIDs[i]];
+        }
     }
 
     event Order(uint indexed orderID, address indexed submitter, bytes32 sourceCurrencyKey, uint sourceAmount, bytes32 destinationCurrencyKey, uint minDestinationAmount, uint executionFee, uint weiDeposit);
     event Cancel(uint indexed orderID);
     event Execute(uint indexed orderID, address executer);
+    event Withdraw(uint indexed orderID, address indexed submitter);
 
 }
