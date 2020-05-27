@@ -12,7 +12,7 @@ describe("Proxy", function() {
     const resolver = await Resolver.deploy(implementation.address, "0x0000000000000000000000000000000000000001");
     await resolver.deployed();
     const Proxy = await ethers.getContractFactory("Proxy");
-    let proxy = await Proxy.deploy(resolver.address, "0x0000000000000000000000000000000000000001");
+    let proxy = await Proxy.deploy(resolver.address);
     proxy = new ethers.Contract(proxy.address, implementation.interface, signer);
     expect(await proxy.value()).to.equal("value");
   });
