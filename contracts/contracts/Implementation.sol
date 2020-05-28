@@ -3,6 +3,7 @@ pragma solidity ^0.4.25;
 interface ISynth {
     function transferFrom(address, address, uint) external returns (bool);
     function transfer(address, uint) external returns (bool);
+    function transferAndSettle(address, uint) external returns (bool);
 }
 
 interface ISynthetix {
@@ -84,10 +85,10 @@ contract Implementation {
         order.executed = true;
         emit Execute(orderID, msg.sender);
         gasUsed -= gasleft();
-        uint refund = ((gasUsed + 40919) * tx.gasprice) + order.executionFee; // magic number generated using tests
+        uint refund = ((gasUsed + 44238) * tx.gasprice) + order.executionFee; // magic number generated using tests
         require(order.weiDeposit >= refund, "Insufficient weiDeposit");
-        order.weiDeposit -= refund;
         msg.sender.transfer(refund);
+        order.submitter.transfer(order.weiDeposit - refund);
     }
 
     function withdrawOrders(uint[] orderIDs) public {
@@ -97,7 +98,7 @@ contract Implementation {
             require(order.executed == true, "Order not yet executed");
             require((order.executionTimestamp + withdrawalDelay) < block.timestamp, "Fee reclamation window not passed");
             ISynth destinationSynth = ISynth(synthetix.synths(order.destinationCurrencyKey));
-            require(destinationSynth.transfer(msg.sender, order.destinationAmount), "synth.transfer() failed");
+            require(destinationSynth.transferAndSettle(msg.sender, order.destinationAmount), "synth.transferAndSettle() failed");
             emit Withdraw(orderIDs[i], order.submitter);
             delete orders[orderIDs[i]];
         }
