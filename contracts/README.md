@@ -7,6 +7,8 @@
 * ImplementationResolver: [0x90Ce04CDA35204bfe7553C6Ad035438D2De135d6](https://rinkeby.etherscan.io/address/0x90ce04cda35204bfe7553c6ad035438d2de135d6)
 * Proxy: [0xF771A01C488c24F7755Ad1824650D3e243B65A9c](https://rinkeby.etherscan.io/address/0xf771a01c488c24f7755ad1824650d3e243b65a9c)
 
+For convenience, use the [OneClickDapp page](https://oneclickdapp.com/cola-tarzan/) for testnet manual testing.
+
 ## Test
 ```sh
 npx buidler test
