@@ -13,7 +13,7 @@ The Limit Order Execution Node is an always-running node that collects `NewOrder
 
 ### Watcher Service
 
-This service listens for new Ethereum blocks in realtime. On each new block, the service calls the Proxy contract's `getAllExecutableOrders` view function. This function will return an array of `orderID`s that are immediately executable by the service. This array also excludes cancelled or previously executed limit orders.
+This service listens for new Ethereum blocks in realtime. On each new block, the service queries the contract for currently executable orders.
 
 If any executable limit orders are found, they are passed to the Execution Service
 
