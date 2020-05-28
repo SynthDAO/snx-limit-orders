@@ -9,6 +9,8 @@
 
 For convenience, use the [OneClickDapp page](https://oneclickdapp.com/cola-tarzan/) for testnet manual testing.
 
+(make sure to approve the proxy contract for each token used as source currency before trying to place an order)
+
 ## Test
 ```sh
 npx buidler test
