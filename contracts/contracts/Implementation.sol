@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.5.16;
 
 interface ISynth {
     function transferFrom(address, address, uint) external returns (bool);
@@ -20,7 +20,7 @@ contract Implementation {
     mapping (uint256 => LimitOrder) public orders;
 
     struct LimitOrder {
-        address submitter;
+        address payable submitter;
         bytes32 sourceCurrencyKey;
         uint256 sourceAmount;
         bytes32 destinationCurrencyKey;
@@ -85,15 +85,15 @@ contract Implementation {
         order.executed = true;
         emit Execute(orderID, msg.sender);
         gasUsed -= gasleft();
-        uint refund = ((gasUsed + 44238) * tx.gasprice) + order.executionFee; // magic number generated using tests
+        uint refund = ((gasUsed + 44179) * tx.gasprice) + order.executionFee; // magic number generated using tests
         require(order.weiDeposit >= refund, "Insufficient weiDeposit");
         msg.sender.transfer(refund);
         order.submitter.transfer(order.weiDeposit - refund);
     }
 
-    function withdrawOrders(uint[] orderIDs) public {
+    function withdrawOrders(uint[] memory orderIDs) public {
         for (uint i = 0; i < orderIDs.length; i++) {
-            LimitOrder order = orders[orderIDs[i]];
+            LimitOrder memory order = orders[orderIDs[i]];
             require(msg.sender == order.submitter, "Not order submitter");
             require(order.executed == true, "Order not yet executed");
             require((order.executionTimestamp + withdrawalDelay) < block.timestamp, "Fee reclamation window not passed");

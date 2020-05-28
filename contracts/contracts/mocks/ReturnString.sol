@@ -1,8 +1,8 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.5.16;
 
 contract ReturnString {
 
-    function value() pure public returns (string) {
+    function value() pure public returns (string memory) {
         return "value";
     }
 }

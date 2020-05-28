@@ -1,6 +1,6 @@
 # SynthLimitOrder Contracts Spec
 *NOTES*:
- - The following specifications use syntax from Solidity `0.4.25` (or above)
+ - The following specifications use syntax from Solidity `^0.5.16`.
  - In order for these contracts to be able to access user SNX tokens, they must approve the proxy contract address for each token individually using the ERC20 approve() function. We recommend a max uint (2^256 - 1) approval amount.
 
 *Order of deployment*:
@@ -36,7 +36,7 @@ A mapping between uint256 orderIDs and `LimitOrder` structs
 #### LimitOrder
 ```js
 struct LimitOrder {
-    address submitter;
+    address payable submitter;
     bytes32 sourceCurrencyKey;
     uint256 sourceAmount;
     bytes32 destinationCurrencyKey;
