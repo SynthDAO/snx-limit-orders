@@ -8,7 +8,7 @@ async function main() {
 
   const SYNTHETIX_ADDRESS = process.env.SYNTHETIX_ADDRESS
   const FEE_RECLAMATION_WINDOW = process.env.FEE_RECLAMATION_WINDOW
-  const INITIAL_OWNER = proces.env.INITIAL_OWNER
+  const INITIAL_OWNER = process.env.INITIAL_OWNER
 
   const [deployer] = await ethers.getSigners();
   console.log(
