@@ -1,13 +1,10 @@
-// We require the Buidler Runtime Environment explicitly here. This is optional 
-// but useful for running the script in a standalone fashion through `node <script>`.
-// When running the script with `buidler run <script>` you'll find the Buidler
-// Runtime Environment's members available in the global scope.
-const bre = require("@nomiclabs/buidler");
+const synthetix = require('synthetix');
 
 async function main() {
 
-  const SYNTHETIX_ADDRESS = process.env.SYNTHETIX_ADDRESS
-  const FEE_RECLAMATION_WINDOW = process.env.FEE_RECLAMATION_WINDOW
+  const network = process.env.BUIDLER_NETWORK
+
+  const SYNTHETIX_ADDRESS = synthetix.getTarget({ network, contract: 'ProxyERC20' }).address
   const INITIAL_OWNER = process.env.INITIAL_OWNER
 
   const [deployer] = await ethers.getSigners();
