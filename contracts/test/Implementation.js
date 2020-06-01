@@ -13,6 +13,12 @@ async function deployContracts () {
     const Synthetix = await ethers.getContractFactory("Synthetix");
     const synthetix = await Synthetix.deploy(synth.address);
     await synthetix.deployed();
+    const Exchanger = await ethers.getContractFactory("Exchanger");
+    const exchanger = await Exchanger.deploy();
+    await exchanger.deployed();
+    const AddressResolver = await ethers.getContractFactory("AddressResolver");
+    const addressResolver = await AddressResolver.deploy(exchanger.address);
+    await addressResolver.deployed();
     // source
     const Implementation = await ethers.getContractFactory("Implementation");
     const implementation = await Implementation.deploy();
@@ -24,7 +30,7 @@ async function deployContracts () {
     let proxy = await Proxy.deploy(resolver.address);
     await proxy.deployed();
     proxy = new ethers.Contract(proxy.address, implementation.interface, signer);
-    await proxy.initialize(synthetix.address, 0);
+    await proxy.initialize(synthetix.address, addressResolver.address);
     return {
         signer,
         addr1,

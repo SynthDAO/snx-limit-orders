@@ -1,10 +1,12 @@
 const synthetix = require('synthetix');
+require('dotenv-safe').config();
 
 async function main() {
 
   const network = process.env.BUIDLER_NETWORK
 
   const SYNTHETIX_ADDRESS = synthetix.getTarget({ network, contract: 'ProxyERC20' }).address
+  const ADDRESS_RESOLVER = synthetix.getTarget({ network, contract: 'AddressResolver' }).address
   const INITIAL_OWNER = process.env.INITIAL_OWNER
 
   const [deployer] = await ethers.getSigners();
@@ -25,7 +27,7 @@ async function main() {
   let proxy = await Proxy.deploy(resolver.address);
   await proxy.deployed();
   proxy = new ethers.Contract(proxy.address, implementation.interface, deployer);
-  await proxy.initialize(SYNTHETIX_ADDRESS, FEE_RECLAMATION_WINDOW);
+  await proxy.initialize(SYNTHETIX_ADDRESS, ADDRESS_RESOLVER);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
