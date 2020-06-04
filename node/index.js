@@ -9,6 +9,8 @@ const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS
 const NETWORK = process.env.NETWORK
 const MIN_EXECUTION_FEE_WEI = process.env.MIN_EXECUTION_FEE_WEI // string
 const GAS_PRICE_WEI = process.env.GAS_PRICE_WEI // string
+const NOTIFY_WEBHOOK = process.env.NOTIFY_WEBHOOK // string
+const LOW_BALANCE_THRESHOLD_WEI = process.env.LOW_BALANCE_THRESHOLD_WEI
 
 const provider = new ethers.providers.JsonRpcProvider(PROVIDER_URL, NETWORK)
 const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
@@ -23,7 +25,8 @@ const abi = [
 const contract = new ethers.Contract(CONTRACT_ADDRESS, abi, wallet);
 
 Execution(wallet, contract, GAS_PRICE_WEI).then((execution) => {
-    const watcher = Watcher(provider, contract, MIN_EXECUTION_FEE_WEI)
+    const watcher = Watcher(wallet, provider, contract, MIN_EXECUTION_FEE_WEI, NOTIFY_WEBHOOK, LOW_BALANCE_THRESHOLD_WEI)
 
     watcher.watch(execution.executeOrders)
+    console.log("Node running successfully")
 })

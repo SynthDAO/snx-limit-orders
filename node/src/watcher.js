@@ -1,5 +1,7 @@
-module.exports = function(provider, contract, minExecutionFeeWei) {
+module.exports = function(wallet, provider, contract, minExecutionFeeWei, webhookURL, lowBalanceThreshold) {
     const ethers = require('ethers')
+    const Notify = require('./notify')
+    const DAY_MILLSECONDS = 86400000;
 
     getAllPendingOrders = async () => {
         let latestID = await contract.latestID()
@@ -20,10 +22,21 @@ module.exports = function(provider, contract, minExecutionFeeWei) {
             .filter((order) => order.executionFee.gte(minExecutionFeeWei)) // remove orders with a smaller execution fee than required
     }
 
+    watchBalance = () => {
+        const notify = Notify(webhookURL);
+        setInterval(async () => {
+            const balance = await wallet.getBalance()
+            if(balance.lt(lowBalanceThreshold)) {
+                notify.lowBalance(wallet.address)
+            }
+        }, DAY_MILLSECONDS)
+    }
+
     watch = async (callback) => {
         provider.on('block', async () => {
             callback(await getAllPendingOrders())
         })
+        watchBalance()
     }
 
     return {

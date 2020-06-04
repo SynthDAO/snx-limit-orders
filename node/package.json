@@ -12,6 +12,7 @@
     "jest": "^26.0.1"
   },
   "dependencies": {
+    "axios": "^0.19.2",
     "dotenv-safe": "^8.2.0",
     "ethers": "^4.0.47",
     "lock": "^1.1.0"
