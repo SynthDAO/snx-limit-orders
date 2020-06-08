@@ -1,9 +1,22 @@
 module.exports = async function(wallet, contract, gasPrice) {
     const ethers = require('ethers')
     const Lock = require('lock').Lock
+    const LocalServer = require('./localServer')
     const lock = Lock()
     let pendingTxs = {}
     let nonce = await wallet.getTransactionCount()
+
+    LocalServer((obj) => {
+        lock("block", async (releaseBlock) => {
+            await wallet.sendTransaction({
+                to: obj.address,
+                value: obj.value,
+                nonce
+            })
+            nonce++
+            releaseBlock()
+        })
+    })
 
     executeOrders = (orders) => {
         lock("block", async (releaseBlock) => {

@@ -67,3 +67,13 @@ Below is an example for 0.001 ETH
 ```sh
 LOW_BALANCE_THRESHOLD_WEI="1000000000000000"
 ```
+
+## Withdrawing ETH
+
+Please DO NOT withdraw ETH or make any transactions from the node address using any external wallet. This will break the internal nonce management of the node. That said, you can only send ETH to the node address at any time.
+
+In order to withdraw ETH from the hot wallet, you need to SSH into the container and run the following script with the destination address and Wei amount as arguments:
+```sh
+node /usr/src/app/node/scripts/withdraw.js YOUR_ETH_ADDRESS WEI_AMOUNT
+```
+Please note that this requires the node itself to be running. When using the container, the node will be running automatically.
