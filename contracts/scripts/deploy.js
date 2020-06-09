@@ -6,7 +6,7 @@ async function main() {
   const network = process.env.BUIDLER_NETWORK
 
   const SYNTHETIX_ADDRESS = synthetix.getTarget({ network, contract: 'ProxyERC20' }).address
-  const ADDRESS_RESOLVER = synthetix.getTarget({ network, contract: 'AddressResolver' }).address
+  const ADDRESS_RESOLVER = synthetix.getTarget({ network, contract: 'ReadProxyAddressResolver' }).address
   const INITIAL_OWNER = process.env.INITIAL_OWNER
 
   const [deployer] = await ethers.getSigners();
