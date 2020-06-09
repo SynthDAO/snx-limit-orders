@@ -1,13 +1,12 @@
-// We require the Buidler Runtime Environment explicitly here. This is optional 
-// but useful for running the script in a standalone fashion through `node <script>`.
-// When running the script with `buidler run <script>` you'll find the Buidler
-// Runtime Environment's members available in the global scope.
-const bre = require("@nomiclabs/buidler");
+const synthetix = require('synthetix');
+require('dotenv-safe').config();
 
 async function main() {
 
-  const SYNTHETIX_ADDRESS = process.env.SYNTHETIX_ADDRESS
-  const FEE_RECLAMATION_WINDOW = process.env.FEE_RECLAMATION_WINDOW
+  const network = process.env.BUIDLER_NETWORK
+
+  const SYNTHETIX_ADDRESS = synthetix.getTarget({ network, contract: 'ProxyERC20' }).address
+  const ADDRESS_RESOLVER = synthetix.getTarget({ network, contract: 'ReadProxyAddressResolver' }).address
   const INITIAL_OWNER = process.env.INITIAL_OWNER
 
   const [deployer] = await ethers.getSigners();
@@ -28,7 +27,7 @@ async function main() {
   let proxy = await Proxy.deploy(resolver.address);
   await proxy.deployed();
   proxy = new ethers.Contract(proxy.address, implementation.interface, deployer);
-  await proxy.initialize(SYNTHETIX_ADDRESS, FEE_RECLAMATION_WINDOW);
+  await proxy.initialize(SYNTHETIX_ADDRESS, ADDRESS_RESOLVER);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

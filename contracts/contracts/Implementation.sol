@@ -1,5 +1,7 @@
 pragma solidity ^0.5.16;
 
+import "synthetix/contracts/interfaces/IAddressResolver.sol";
+
 interface ISynth {
     function transferFrom(address, address, uint) external returns (bool);
     function transfer(address, uint) external returns (bool);
@@ -11,11 +13,15 @@ interface ISynthetix {
     function exchange(bytes32, uint, bytes32) external returns (uint);
 }
 
+interface IExchanger {
+    function waitingPeriodSecs() external view returns (uint);
+}
+
 contract Implementation {
 
     bool initialized;
     ISynthetix synthetix;
-    uint withdrawalDelay;
+    IAddressResolver addressResolver; 
     uint256 public latestID;
     mapping (uint256 => LimitOrder) public orders;
 
@@ -32,11 +38,11 @@ contract Implementation {
         bool executed;
     }
 
-    function initialize(address synthetixAddress, uint _withdrawalDelay) public {
+    function initialize(address synthetixAddress, address _addressResolver) public {
         require(initialized == false, "Already initialized");
         initialized = true;
         synthetix = ISynthetix(synthetixAddress);
-        withdrawalDelay = _withdrawalDelay;
+        addressResolver = IAddressResolver(_addressResolver);
     }
 
     function newOrder(bytes32 sourceCurrencyKey, uint sourceAmount, bytes32 destinationCurrencyKey, uint minDestinationAmount, uint executionFee) payable public returns (uint) {
@@ -85,13 +91,15 @@ contract Implementation {
         order.executed = true;
         emit Execute(orderID, msg.sender);
         gasUsed -= gasleft();
-        uint refund = ((gasUsed + 44179) * tx.gasprice) + order.executionFee; // magic number generated using tests
+        uint refund = ((gasUsed + 44201) * tx.gasprice) + order.executionFee; // magic number generated using tests
         require(order.weiDeposit >= refund, "Insufficient weiDeposit");
         msg.sender.transfer(refund);
         order.submitter.transfer(order.weiDeposit - refund);
     }
 
     function withdrawOrders(uint[] memory orderIDs) public {
+        IExchanger exchanger = IExchanger(addressResolver.getAddress('Exchanger'));
+        uint withdrawalDelay = exchanger.waitingPeriodSecs();
         for (uint i = 0; i < orderIDs.length; i++) {
             LimitOrder memory order = orders[orderIDs[i]];
             require(msg.sender == order.submitter, "Not order submitter");
