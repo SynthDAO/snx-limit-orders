@@ -1,5 +1,7 @@
 pragma solidity ^0.5.16;
 
+import "synthetix/contracts/interfaces/IAddressResolver.sol";
+
 interface ISynth {
     function transferFrom(address, address, uint) external returns (bool);
     function transfer(address, uint) external returns (bool);
@@ -9,10 +11,6 @@ interface ISynth {
 interface ISynthetix {
     function synths(bytes32) external returns (address);
     function exchange(bytes32, uint, bytes32) external returns (uint);
-}
-
-interface IAddressResolver {
-    function getAddress(bytes32 name) external view returns (address);
 }
 
 interface IExchanger {
