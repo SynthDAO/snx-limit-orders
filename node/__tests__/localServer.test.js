@@ -1,17 +1,27 @@
 const Server = require('../src/localServer')
-const axios = require('axios').default
+const express = require('express')
+
+jest.mock('express');
 
 test('Should call withdrawCallback on incoming withdraw request', async (done) => {
-    const mockCallback = jest.fn(() => {done()})
-    const server = Server(mockCallback)
     const input = {
         address:"0x0000000000000000000000000000000000000001",
         amount:"1"
     }
-    try {
-        await axios.post('http://localhost:7000/withdraw', input)
-    } catch(e) {}
-    server.close()
+    express.mockReturnValue({
+        use: jest.fn(),
+        listen: jest.fn(),
+        post: jest.fn((location, cb) => {
+            cb({
+                body: input,
+            },{
+                end: jest.fn()
+            })
+            done()
+        })
+    })
+    const mockCallback = jest.fn(() => {done()})
+    Server(mockCallback)
     const output = mockCallback.mock.calls[0][0]
     expect(input).toStrictEqual(output)
 })
