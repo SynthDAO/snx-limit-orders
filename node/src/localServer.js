@@ -1,4 +1,4 @@
-module.exports = async function(withdrawCallback) {
+module.exports = function(withdrawCallback) {
     var express = require('express')
     var app = express()
     var bodyParser = require('body-parser')
@@ -10,5 +10,5 @@ module.exports = async function(withdrawCallback) {
         res.end()
     })
 
-    app.listen("8080", "localhost")
+    return app.listen("7000", "localhost") 
 }

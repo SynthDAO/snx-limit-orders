@@ -12,7 +12,7 @@ try {
     throw new Error("Invalid Ethereum address", e)
 }
 
-axios.post('http://127.0.0.1:8080/withdraw', {address, amount}).then((result)=>{
+axios.post('http://localhost:7000/withdraw', {address, amount}).then((result)=>{
     console.log(result.status === 200? "Withdrawal request submitted successfully.": `Something went wrong. Status ${result.status}`)
 }).catch((e)=>{
     console.error("Withdrawal request failed. Make sure node is already running.", e.message)
