@@ -20,7 +20,7 @@ const abi = [
     "function executeOrder(uint orderID) public",
     "event Order(uint indexed orderID, address indexed submitter, bytes32 sourceCurrencyKey, uint sourceAmount, bytes32 destinationCurrencyKey, uint minDestinationAmount, uint executionFee, uint weiDeposit)",
     "event Cancel(uint indexed orderID)",
-    "event Execute(uint indexed orderID, address executer)"
+    "event Execute(uint indexed orderID, address indexed submitter, address executer)"
 ]
 const contract = new ethers.Contract(CONTRACT_ADDRESS, abi, wallet);
 
