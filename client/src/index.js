@@ -23,7 +23,8 @@ class Client {
 
   getContract = async () => {
     const network = await this.provider.getNetwork()
-    return new ethers.Contract(CONSTANTS[network].contractAddress, ABI, this.provider)
+    const signer = this.provider.getSigner()
+    return new ethers.Contract(CONSTANTS[network].contractAddress, ABI, signer)
   }
 
   submitOrder = async ({sourceCurrencyKey, sourceAmount, destinationCurrencyKey, minDestinationAmount, executionFee, weiDeposit}) => {
