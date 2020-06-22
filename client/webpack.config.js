@@ -27,7 +27,7 @@ module.exports = {
   output: {
     filename: 'index.js',
     path: path.resolve(__dirname, 'build'),
-    library: 'snx-limit-orders-client',
+    library: 'Client',
     libraryTarget: 'umd'
   },
   module: {
