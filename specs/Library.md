@@ -75,14 +75,16 @@ interface Order {
     minDestinationAmount: string;
     weiDeposit:string;
     executionFee:string;
-    active:boolean;
+    executionTimestamp:string;
+    destinationAmount:string;
+    executed:boolean;
 }
 ```
 
-### getAllOrders
+### getAllActiveOrders
 
 ``` js
-const order = await instance.getAllOrders()
+const order = await instance.getAllActiveOrders()
 ```
 This method allows the user to query the contract for an array all active orders submitted by the user's address. This array is constructed by querying a list of all past `Order` contract events filtered by the user's wallet address as the `submitter`. Each `orderID` is passed to the `getOrder` javascript method before being included in the returned array in order to ensure that the order is still active.
 
