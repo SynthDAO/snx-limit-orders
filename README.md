@@ -1,6 +1,6 @@
-![Contracts Tests](https://github.com/mosendo/snx-limit-orders/workflows/Contracts%20Tests/badge.svg) [![codecov](https://codecov.io/gh/mosendo/snx-limit-orders/branch/master/graph/badge.svg?token=1NMM3S22OB)](https://codecov.io/gh/mosendo/snx-limit-orders)
+![Contracts Tests](https://github.com/mosendo/snx-limit-orders/workflows/Contracts%20Tests/badge.svg)
 
-# SNX Limit Orders (Work In Progress)
+# SNX Limit Orders (Pending Audit)
 
 ## Summary
 We propose a trustless architecture for adding limit orders functionality to the Synthetix Exchange that would not require any changes to the core contracts.
