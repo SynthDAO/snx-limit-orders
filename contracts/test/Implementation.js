@@ -46,9 +46,9 @@ describe("Implementation", function() {
 
   it("Should allow anyone to create newOrder", async function() {
     const { proxy, signer } = await deployContracts()
-    await proxy.connect(signer).newOrder(hashZero, 1, hashOne, 1, 1, {
+    await expect(proxy.connect(signer).newOrder(hashZero, 1, hashOne, 1, 1, {
       value:2
-    });
+    })).to.emit(proxy, 'Order');
     expect(((await proxy.orders(1)).submitter)).to.equal(await signer.getAddress());
   });
 
@@ -57,7 +57,7 @@ describe("Implementation", function() {
     await proxy.connect(signer).newOrder(hashZero, 1, hashOne, 1, 1, {
       value:2
     });
-    await proxy.cancelOrder(1);
+    await expect(proxy.cancelOrder(1)).to.emit(proxy, 'Cancel');
     expect(((await proxy.orders(1)).submitter)).to.equal(addressZero);
   });
 
@@ -66,7 +66,7 @@ describe("Implementation", function() {
     await proxy.connect(signer).newOrder(hashZero, 1, hashOne, 1, 1, {
       value: ethers.utils.parseEther('1')
     });
-    await proxy.connect(addr1).executeOrder(1);
+    await expect(proxy.connect(addr1).executeOrder(1)).to.emit(proxy, 'Execute');
     expect((await proxy.orders(1)).executed).to.equal(true);
     expect(proxy.executeOrder(1)).to.be.revertedWith("Order already executed")
   });
@@ -107,7 +107,7 @@ describe("Implementation", function() {
     await proxy.connect(addr1).executeOrder(2, {
       gasPrice:1
     });
-    await proxy.withdrawOrders([1,2]);
+    await expect(proxy.withdrawOrders([1,2])).to.emit(proxy, 'Withdraw');
     expect(((await proxy.orders(1)).submitter)).to.equal(addressZero);
     expect(((await proxy.orders(2)).submitter)).to.equal(addressZero);
   });
