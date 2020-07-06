@@ -26,9 +26,9 @@ In order to determine whether an `orderID` should be immediately executed, the s
 
 After the checks have passed, the order is executed:
 - The `orderID` is submitted to the `executeOrder` function in a new transaction
-- The `orderID` is mapped to the resulting transaction hash in the local database to prevent future duplicate transactions.
+- The `orderID` is temporarily stored in the local database to prevent future duplicate transactions until the transaction is included in a block.
 
 The execution service then listens for the transaction status.
 If the transaction is successfully mined and but the EVM execution has failed:
-- The service removes both the mapped `orderID` and transaction hash from the local database
+- The service removes both the mapped `orderID` from the local database
 - This `orderID` will then be collected again by the Watcher Service as soon as its conditions are met, starting from the next block.

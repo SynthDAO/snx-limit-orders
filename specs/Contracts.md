@@ -54,7 +54,7 @@ struct LimitOrder {
 #### initialize
 
 ``` js
-function initialize(address synthetixAddress, uint _withdrawalDelay) public;
+function initialize(address synthetixAddress, address _addressResolver) public;
 ```
 
 This method can only be called once to initialize the proxy instance.
@@ -62,14 +62,14 @@ This method can only be called once to initialize the proxy instance.
 #### newOrder
 
 ``` js
-function newOrder(bytes32 sourceCurrencyKey, uint sourceAmount, bytes32 destinationCurrencyKey, uint minDestinationAmount, uint executionFee) public returns (uint orderID);
+function newOrder(bytes32 sourceCurrencyKey, uint sourceAmount, bytes32 destinationCurrencyKey, uint minDestinationAmount, uint executionFee) payable public returns (uint orderID);
 ```
 
 This function allows a `msg.sender` who has already given the `Proxy` contract an allowance of `sourceCurrencyKey` to submit a new limit order.
 
 1. Transfers `sourceAmount` of the `sourceCurrencyKey` Synth from the `msg.sender` to this contract via `transferFrom`.
 2. Adds a new limit order using to the `orders` mapping where the key is `latestID + 1`. The order's `executed` property is set to `false`.
-3. Updates the global `latestID` variable.
+3. Increments the global `latestID` variable.
 4. Requires a deposited `msg.value` to be more than the `executionFee` in order to refund node operators for their exact gas wei cost in addition to the `executionFee` amount. The remainder will be transferred back to the user at the end of the trade.
 5. Emits an `Order` event for node operators including order data and `orderID`.
 6. Returns the `orderID`.
@@ -113,7 +113,7 @@ function withdrawOrders(uint[] orderID) public;
 
 This function allows the sender to withdraw funds associated with an array of executed orders as soon as the Synthetix fee reclamation window for each of the order has elapsed.
 
-It iterates over each order's data from the `orders` mapping, if each order's `submitter` is equal to `msg.sender`, has the `executed` property equal to `true` and `executionTimestamp + 3 minutes < block.timestamp`:
+It iterates over each order's data from the `orders` mapping, if each order's `submitter` is equal to `msg.sender`, has the `executed` property equal to `true` and `executionTimestamp + Exchanger.waitingPeriodSecs() < block.timestamp`:
 
 1. The `destinationAmount` of the `destinationCurrencyKey` is transferred to `msg.sender` using `Synth.transferAndSettle()`
 2. The order is deleted using from the `orders` mapping.
