@@ -89,7 +89,7 @@ contract Implementation {
         order.executionTimestamp = block.timestamp;
         order.destinationAmount = destinationAmount;
         order.executed = true;
-        emit Execute(orderID, msg.sender);
+        emit Execute(orderID, order.submitter, msg.sender);
         gasUsed -= gasleft();
         uint refund = ((gasUsed + 44201) * tx.gasprice) + order.executionFee; // magic number generated using tests
         require(order.weiDeposit >= refund, "Insufficient weiDeposit");
@@ -114,7 +114,7 @@ contract Implementation {
 
     event Order(uint indexed orderID, address indexed submitter, bytes32 sourceCurrencyKey, uint sourceAmount, bytes32 destinationCurrencyKey, uint minDestinationAmount, uint executionFee, uint weiDeposit);
     event Cancel(uint indexed orderID);
-    event Execute(uint indexed orderID, address executer);
+    event Execute(uint indexed orderID, address indexed submitter, address executer);
     event Withdraw(uint indexed orderID, address indexed submitter);
 
 }
