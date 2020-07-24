@@ -110,38 +110,3 @@ test('getAllActiveOrders should return active limit orders array', async () => {
   expect(orders.length).toBe(1)
   expect(mockQueryFilter).toHaveBeenCalled()
 });
-
-test('withdraw should send a withdrawOrders tx with an array of user executed orders', async () => {
-  client.getContract = jest.fn()
-  const mockQueryFilter = jest.fn()
-  const mockWithdrawOrders = jest.fn()
-  client.getContract.mockResolvedValue({
-    filters:{
-      Execute: jest.fn()
-    },
-    queryFilter: mockQueryFilter,
-    withdrawOrders: mockWithdrawOrders
-  })
-  mockQueryFilter.mockResolvedValue([
-    {
-      data:{
-        orderID:"1"
-      }
-    }
-  ])
-  client.getOrder = jest.fn()
-  const mockAddress = "0x0000000000000000000000000000000000000001"
-  client.provider.provider.selectedAddress = mockAddress
-  client.getOrder.mockResolvedValue({
-    submitter:mockAddress,
-    sourceCurrencyKey: "0x0",
-    sourceAmount:"1",
-    destinationCurrencyKey:"0x0",
-    minDestinationAmount:"1",
-    executionFee:"1",
-    weiDeposit:"1",
-    executed:true
-  })
-  await client.withdraw()
-  expect(mockWithdrawOrders).toHaveBeenLastCalledWith(["1"])
-});
