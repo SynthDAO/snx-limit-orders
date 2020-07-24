@@ -7,18 +7,9 @@ const addressZero = "0x0000000000000000000000000000000000000000";
 async function deployContracts () {
     const [signer, addr1] = await ethers.getSigners();
     // mocks
-    const Synth = await ethers.getContractFactory("Synth");
-    const synth = await Synth.deploy();
-    await synth.deployed();
     const Synthetix = await ethers.getContractFactory("Synthetix");
-    const synthetix = await Synthetix.deploy(synth.address);
+    const synthetix = await Synthetix.deploy();
     await synthetix.deployed();
-    const Exchanger = await ethers.getContractFactory("Exchanger");
-    const exchanger = await Exchanger.deploy();
-    await exchanger.deployed();
-    const AddressResolver = await ethers.getContractFactory("AddressResolver");
-    const addressResolver = await AddressResolver.deploy(exchanger.address);
-    await addressResolver.deployed();
     // source
     const Implementation = await ethers.getContractFactory("Implementation");
     const implementation = await Implementation.deploy();
@@ -30,14 +21,12 @@ async function deployContracts () {
     let proxy = await Proxy.deploy(resolver.address);
     await proxy.deployed();
     proxy = new ethers.Contract(proxy.address, implementation.interface, signer);
-    await proxy.initialize(synthetix.address, addressResolver.address);
+    await proxy.initialize(synthetix.address);
     return {
         signer,
         addr1,
         implementation,
-        resolver,
         proxy,
-        synth,
         synthetix
     }
 }
@@ -67,7 +56,7 @@ describe("Implementation", function() {
       value: ethers.utils.parseEther('1')
     });
     await expect(proxy.connect(addr1).executeOrder(1)).to.emit(proxy, 'Execute');
-    expect((await proxy.orders(1)).executed).to.equal(true);
+    expect((await proxy.orders(1)).submitter).to.equal(addressZero);
     expect(proxy.executeOrder(1)).to.be.revertedWith("Order already executed")
   });
 
@@ -91,25 +80,6 @@ describe("Implementation", function() {
     });
     afterBalance = await addr1.getBalance();
     expect(afterBalance.sub(1).sub(beforeBalance).toNumber()).to.equal(0);
-  });
-
-  it("Should allow user to withdrawOrders", async function() {
-    const { proxy, signer, addr1 } = await deployContracts()
-    await proxy.connect(signer).newOrder(hashZero, 1, hashOne, 1, 1, {
-      value: ethers.utils.parseEther('1'),
-    });
-    await proxy.connect(addr1).executeOrder(1, {
-      gasPrice:1
-    });
-    await proxy.connect(signer).newOrder(hashZero, 1, hashOne, 1, 1, {
-      value: ethers.utils.parseEther('1'),
-    });
-    await proxy.connect(addr1).executeOrder(2, {
-      gasPrice:1
-    });
-    await expect(proxy.withdrawOrders([1,2])).to.emit(proxy, 'Withdraw');
-    expect(((await proxy.orders(1)).submitter)).to.equal(addressZero);
-    expect(((await proxy.orders(2)).submitter)).to.equal(addressZero);
   });
 
 })
