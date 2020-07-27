@@ -1,7 +1,6 @@
 # SynthLimitOrder Contracts Spec
 *NOTES*:
  - The following specifications use syntax from Solidity `^0.5.16`.
- - In order for these contracts to be able to access user SNX tokens, they must approve the proxy contract address for each token individually using the ERC20 approve() function. We recommend a max uint (2^256 - 1) approval amount.
 
 *Order of deployment*:
  1. The `Implementation` contract is deployed
@@ -43,9 +42,6 @@ struct LimitOrder {
     uint256 minDestinationAmount;
     uint256 weiDeposit;
     uint256 executionFee;
-    uint256 executionTimestamp;
-    uint256 destinationAmount;
-    bool executed;
 }
 ```
 
@@ -54,7 +50,7 @@ struct LimitOrder {
 #### initialize
 
 ``` js
-function initialize(address synthetixAddress, address _addressResolver) public;
+function initialize(address synthetixAddress) public;
 ```
 
 This method can only be called once to initialize the proxy instance.
@@ -65,14 +61,13 @@ This method can only be called once to initialize the proxy instance.
 function newOrder(bytes32 sourceCurrencyKey, uint sourceAmount, bytes32 destinationCurrencyKey, uint minDestinationAmount, uint executionFee) payable public returns (uint orderID);
 ```
 
-This function allows a `msg.sender` who has already given the `Proxy` contract an allowance of `sourceCurrencyKey` to submit a new limit order.
+Although this is never explicitly checked by the contract, the user is expected to approve the `Proxy` address to exchange on their behalf before their first interaction with `newOrder` via `DelegateApprovals.approveExchangeOnBehalf()`. Otherwise, their order will never be executed by a node.
 
-1. Transfers `sourceAmount` of the `sourceCurrencyKey` Synth from the `msg.sender` to this contract via `transferFrom`.
-2. Adds a new limit order using to the `orders` mapping where the key is `latestID + 1`. The order's `executed` property is set to `false`.
-3. Increments the global `latestID` variable.
-4. Requires a deposited `msg.value` to be more than the `executionFee` in order to refund node operators for their exact gas wei cost in addition to the `executionFee` amount. The remainder will be transferred back to the user at the end of the trade.
-5. Emits an `Order` event for node operators including order data and `orderID`.
-6. Returns the `orderID`.
+1. Adds a new limit order using to the `orders` mapping where the key is `latestID + 1`.
+2. Increments the global `latestID` variable.
+3. Requires a deposited `msg.value` to be more than the `executionFee` in order to refund node operators for their exact gas wei cost in addition to the `executionFee` amount. The remainder will be transferred back to the user at the end of the trade.
+4. Emits an `Order` event for node operators including order data and `orderID`.
+5. Returns the `orderID`.
 
 #### cancelOrder
 
@@ -83,10 +78,9 @@ function cancelOrder(uint orderID) public;
 This function cancels a previously submitted and unexecuted order by the same `msg.sender` of the input `orderID`.
 
 1. Requires the order `submitter` property to be equal to `msg.sender`.
-2. Requires the order `executed` property to be equal to be `false`.
-3. Refunds the order's `sourceAmount` and deposited `msg.value`
-4. Deletes the order using from the `orders` mapping.
-5. Emits a `Cancel` event for node operators including the `orderID`
+2. Refunds the order's `sourceAmount` and deposited `msg.value`
+3. Deletes the order using from the `orders` mapping.
+4. Emits a `Cancel` event for node operators including the `orderID`
 
 #### executeOrder
 
@@ -96,28 +90,14 @@ function executeOrder(uint orderID) public;
 
 This function allows anyone to execute a limit order.
 
-It fetches the order data from the `orders` mapping and attempts to execute it using `Synthetix.exchange()`, if the amount received is larger than or equal to the order's `minDestinationAmount`:
+It fetches the order data from the `orders` mapping and attempts to execute it using `Synthetix.exchangeOnBehalf()`, if the amount received is larger than or equal to the order's `minDestinationAmount`:
 
 1. This transaction's submitter address is refunded for this transaction's gas cost + the `executionFee` amount from the user's wei deposit.
 2. The remainder of the wei deposit is forwarded to the order submitter's address
-3. The order's `executed` property is changed to `true`, the `executionTimestamp` property set to `block.timestamp` and `destinationAmount` set to the received amount.
+3. The order is deleted from the mapping
 4. `Execute` event is emitted with the `orderID` for node operators 
 
 If the amount received is smaller than the order's `minDestinationAmount`, the transaction reverts.
-
-#### withdrawOrders
-
-``` js
-function withdrawOrders(uint[] orderID) public;
-```
-
-This function allows the sender to withdraw funds associated with an array of executed orders as soon as the Synthetix fee reclamation window for each of the order has elapsed.
-
-It iterates over each order's data from the `orders` mapping, if each order's `submitter` is equal to `msg.sender`, has the `executed` property equal to `true` and `executionTimestamp + Exchanger.waitingPeriodSecs() < block.timestamp`:
-
-1. The `destinationAmount` of the `destinationCurrencyKey` is transferred to `msg.sender` using `Synth.transferAndSettle()`
-2. The order is deleted using from the `orders` mapping.
-3. `Withdraw` event is emitted with the `orderID`.
 
 ### Events
 
@@ -144,14 +124,6 @@ event Execute(uint indexed orderID, address executor);
 ```
 
 This event is emitted on each successfully executed order. Its primary purpose is to alert node operators that a previously submitted order should no longer be watched.
-
-#### Withdraw
-
-``` js
-event Withdraw(uint indexed orderID, address indexed submitter);
-```
-
-This event is emitted on each successfully withdrawn order.
 
 ---
 
