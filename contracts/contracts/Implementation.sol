@@ -64,9 +64,9 @@ contract Implementation {
         gasUsed -= gasleft();
         uint refund = ((gasUsed + 32231) * tx.gasprice) + order.executionFee; // magic number generated using tests
         require(order.weiDeposit >= refund, "Insufficient weiDeposit");
-        msg.sender.transfer(refund);
         order.submitter.transfer(order.weiDeposit - refund);
         delete orders[orderID];
+        msg.sender.transfer(refund);
     }
 
     event Order(uint indexed orderID, address indexed submitter, bytes32 sourceCurrencyKey, uint sourceAmount, bytes32 destinationCurrencyKey, uint minDestinationAmount, uint executionFee, uint weiDeposit);
