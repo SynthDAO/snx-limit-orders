@@ -20,6 +20,7 @@ contract ImplementationResolver {
     }
 
     function changeOwnership(address newOwner) onlyOwner public {
+        require(newOwner != address(0), "New owner cannot be address 0");
         owner = newOwner;
         emit NewOwner(newOwner);
     }
