@@ -28,7 +28,6 @@ contract Implementation {
     }
 
     function newOrder(bytes32 sourceCurrencyKey, uint sourceAmount, bytes32 destinationCurrencyKey, uint minDestinationAmount, uint executionFee) payable public returns (uint) {
-        require(msg.value > 0, "wei deposit must be larger than 0");
         require(msg.value > executionFee, "wei deposit must be larger than executionFee");
         latestID++;
         orders[latestID] = LimitOrder(
