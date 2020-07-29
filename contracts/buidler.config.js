@@ -1,3 +1,4 @@
+require('dotenv-safe').config();
 usePlugin("@nomiclabs/buidler-waffle");
 
 const INFURA_PROJECT_ID = process.env.INFURA_PROJECT_ID;
@@ -10,6 +11,10 @@ module.exports = {
   networks: {
     rinkeby: {
       url: `https://rinkeby.infura.io/v3/${INFURA_PROJECT_ID}`,
+      accounts: [`0x${PRIVATE_KEY}`]
+    },
+    kovan: {
+      url: `https://kovan.infura.io/v3/${INFURA_PROJECT_ID}`,
       accounts: [`0x${PRIVATE_KEY}`]
     }
   }

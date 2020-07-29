@@ -62,22 +62,6 @@ class Client {
     return activeOrders;
   }
 
-  withdraw = async () => {
-    const contract = await this.getContract();
-    const filter = contract.filters.Execute(null, this.provider.provider.selectedAddress);
-    const events = await contract.queryFilter(filter, 0);
-    let pendingWithdrawals = []
-    for (let i = 0; i < events.length; i++) {
-      let orderState = await this.getOrder(events[i].data.orderID)
-      orderState.id = events[i].data.orderID
-      if(orderState.submitter.toLowerCase() === this.provider.provider.selectedAddress && orderState.executed === true) {
-        // TODO: Check fee reclamation window
-        pendingWithdrawals.push(orderState)
-      }
-    }
-    return await contract.withdrawOrders(pendingWithdrawals.map(v => v.id))
-  }
-
 }
 
 export default Client;
