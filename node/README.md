@@ -2,7 +2,7 @@
 
 ## Deploy using docker
 
-The docker image can be found on docker hub at [mosendo1/snx-limit-order-node](https://hub.docker.com/r/mosendo1/snx-limit-order-node).
+The docker image can be found on docker hub at [synthdao/snx-limit-order-node](https://hub.docker.com/r/synthdao/snx-limit-order-node).
 
 It can be deployed on any cloud provider that supports containers **and** container SSH access in order to be able to access the CLI. 
 
