@@ -18,7 +18,6 @@ module.exports = function(wallet, provider, contract, minExecutionFeeWei, webhoo
 
         return orders
             .filter((order) => order.submitter != ethers.constants.AddressZero) // remove deleted (cancelled) orders
-            .filter((order) => !order.executed) // remove executed orders
             .filter((order) => order.executionFee.gte(minExecutionFeeWei)) // remove orders with a smaller execution fee than required
     }
 

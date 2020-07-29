@@ -16,7 +16,7 @@ const provider = new ethers.providers.JsonRpcProvider(PROVIDER_URL, NETWORK)
 const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
 const abi = [
     "function latestID() public view returns (uint)",
-    "function orders(uint orderID) public view returns (tuple(address submitter, bytes32 sourceCurrencyKey, uint256 sourceAmount, bytes32 destinationCurrencyKey, uint256 minDestinationAmount, uint256 weiDeposit, uint256 executionFee, uint256 executionTimestamp, uint256 destinationAmount, bool executed) user)",
+    "function orders(uint orderID) public view returns (tuple(address submitter, bytes32 sourceCurrencyKey, uint256 sourceAmount, bytes32 destinationCurrencyKey, uint256 minDestinationAmount, uint256 weiDeposit, uint256 executionFee) user)",
     "function executeOrder(uint orderID) public",
     "event Order(uint indexed orderID, address indexed submitter, bytes32 sourceCurrencyKey, uint sourceAmount, bytes32 destinationCurrencyKey, uint minDestinationAmount, uint executionFee, uint weiDeposit)",
     "event Cancel(uint indexed orderID)",
