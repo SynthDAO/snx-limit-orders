@@ -6,8 +6,8 @@ Make sure to `approveExchangeOnBehalf()` the proxy contract before trying to pla
 
 ### Mainnet
 * Implementation: [0x736d22180993e20cac87E9B2035560c1De455027](https://etherscan.io/address/0x736d22180993e20cac87E9B2035560c1De455027)
-* ImplementationResolver: [0x2206aa8EC85270ACe5597539E3c287E021D41843](https://ropsten.etherscan.io/address/0x2206aa8EC85270ACe5597539E3c287E021D41843)
-* Proxy: [0x1864Ff44b3f94732b1dEf2502383FE138C636444](https://ropsten.etherscan.io/address/0x1864Ff44b3f94732b1dEf2502383FE138C636444)
+* ImplementationResolver: [0x2206aa8EC85270ACe5597539E3c287E021D41843](https://etherscan.io/address/0x2206aa8EC85270ACe5597539E3c287E021D41843)
+* Proxy: [0x1864Ff44b3f94732b1dEf2502383FE138C636444](https://etherscan.io/address/0x1864Ff44b3f94732b1dEf2502383FE138C636444)
 
 ### Ropsten
 * Implementation: [0xC38776bdB0f02CFa66113F069D1f319f36901736](https://ropsten.etherscan.io/address/0xC38776bdB0f02CFa66113F069D1f319f36901736)
