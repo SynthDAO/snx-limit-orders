@@ -16,13 +16,6 @@
 
 (make sure to `approveExchangeOnBehalf()` the proxy contract before trying to place an order)
 
-### Ropsten
-* Implementation: [0x3dCf67EdABe1B97B44ed6F34c91B4DA9ef8f4933](https://rinkeby.etherscan.io/address/0x3dCf67EdABe1B97B44ed6F34c91B4DA9ef8f4933)
-* ImplementationResolver: [0x76661E0441eCEfD0494DB501e013A82722bdDA6d](https://rinkeby.etherscan.io/address/0x76661E0441eCEfD0494DB501e013A82722bdDA6d)
-* Proxy: [0x2F5a16bb99927A0a663a568b7c54A839527023A7](https://rinkeby.etherscan.io/address/0x2F5a16bb99927A0a663a568b7c54A839527023A7)
-
-(make sure to `approveExchangeOnBehalf()` the proxy contract before trying to place an order)
-
 
 ## Test
 ```sh
