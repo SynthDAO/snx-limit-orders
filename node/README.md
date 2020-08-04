@@ -1,5 +1,9 @@
 # SNX Limit Order Execution Node
 
+## Prerequisites
+
+Node 12+
+
 ## Deploy using docker
 
 The docker image can be found on docker hub at [synthdao/snx-limit-order-node](https://hub.docker.com/r/synthdao/snx-limit-order-node).
