@@ -45,12 +45,6 @@ The minimum fee (in wei) this node will accept from the user to execute their or
 MIN_EXECUTION_FEE_WEI="1"
 ```
 
-### GAS_PRICE_WEI
-The gas price in wei for all transactions sent by this node.
-```sh
-GAS_PRICE_WEI="1000000000"
-```
-
 ### NOTIFY_WEBHOOK
 The webhook url to be called if the node wallet wei balance drops below `LOW_BALANCE_THRESHOLD_WEI`.
 
