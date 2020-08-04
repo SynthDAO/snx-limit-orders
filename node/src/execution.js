@@ -32,15 +32,18 @@ module.exports = async function(wallet, contract) {
             orders = orders
                 .filter((order) => !pendingTxs[order.id]) // remove orders that are already submitted in a pending tx
                 .map((order) => order.id)
+            console.log("Checking", orders.length, "pending orders")
+            orders = (await Promise.allSettled(
+                orders
+                    .map(o => contract.estimate.executeOrder(o.id, {gasPrice}))
+            ))
+            .filter(v => v.status === "fulfilled")
+            .map(v => v.value)
+
+            console.log("Submitting", orders.length, "orders")
 
             for (let i = 0; i < orders.length; i++) {
                 const orderID = orders[i]
-                try {
-                    await contract.estimate.executeOrder(orderID, {gasPrice})
-                } catch(e) {
-                    console.error("Order gas estimation failed", orderID, e)
-                    continue;
-                }
                 try {
                     const tx = await contract.executeOrder(orderID, {nonce, gasPrice})
                     nonce++;
