@@ -12,25 +12,21 @@ test('getAllPendingOrders should return only pending orders', async () => {
           if(id === 1) {
             return {
                 submitter: "0x0000000000000000000000000000000000000001",
-                executed: false,
                 executionFee:ethers.utils.bigNumberify("2")
               }
           } else if(id === 2) {
             return {
                 submitter: "0x0000000000000000000000000000000000000000",
-                executed: false,
                 executionFee:ethers.utils.bigNumberify("2")
               }
           } else if(id === 3) {
             return {
                 submitter: "0x0000000000000000000000000000000000000001",
-                executed: true,
                 executionFee:ethers.utils.bigNumberify("2")
               }
           } else if(id === 4) {
             return {
                 submitter: "0x0000000000000000000000000000000000000001",
-                executed: false,
                 executionFee:ethers.utils.bigNumberify("0")
               }
           }

@@ -3,6 +3,8 @@ module.exports = function(wallet, provider, contract, minExecutionFeeWei, webhoo
     const Notify = require('./notify')
     const DAY_MILLSECONDS = 86400000;
 
+    const orderBlacklist = {}
+
     getAllPendingOrders = async () => {
         let latestID = await contract.latestID()
         latestID = latestID.toNumber()
@@ -11,14 +13,24 @@ module.exports = function(wallet, provider, contract, minExecutionFeeWei, webhoo
 
         for (let i = 0; i <= latestID; i++) {
             if(i === 0) continue;
+            // skip orders that were checked before
+            if(orderBlacklist[i]) continue;
             let order = await contract.orders(i)
-            order.id = i
-            orders.push(order)
+
+            // blacklist and skip cancelled/executed order & those with insufficient execution fee
+            if(
+                order.submitter === ethers.constants.AddressZero
+                ||
+                order.executionFee.lte(minExecutionFeeWei)
+            ) {
+                orderBlacklist[i] = true;
+            } else {
+                order.id = i
+                orders.push(order)
+            }
         }
 
         return orders
-            .filter((order) => order.submitter != ethers.constants.AddressZero) // remove deleted (cancelled) orders
-            .filter((order) => order.executionFee.gte(minExecutionFeeWei)) // remove orders with a smaller execution fee than required
     }
 
     watchBalance = () => {
