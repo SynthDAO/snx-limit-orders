@@ -11,7 +11,7 @@ module.exports = function(wallet, provider, contract, minExecutionFeeWei, webhoo
 
         let orderIDs = Array.from(Array(latestID), (_, i) => i + 1) // array of IDs from 1 to latestDS
 
-        let orders = await Promise.all(
+        let orders = await Promise.allSettled(
             orderIDs
                 .filter((id) => !orderBlacklist[id])
                 .map(id => contract.orders(id))
@@ -19,6 +19,7 @@ module.exports = function(wallet, provider, contract, minExecutionFeeWei, webhoo
 
         return orders
             .filter((order, i) => {
+                order = order.value
                 if(order.submitter === ethers.constants.AddressZero || order.executionFee.lte(minExecutionFeeWei)) {
                     orderBlacklist[i + 1] = true
                     return false
