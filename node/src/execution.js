@@ -22,7 +22,7 @@ module.exports = async function(wallet, contract) {
                 nonce
             })
             nonce++
-            releaseBlock()
+            releaseBlock()()
         })
     })
 
@@ -61,7 +61,7 @@ module.exports = async function(wallet, contract) {
                     continue
                 }
             }
-            releaseBlock()
+            releaseBlock()()
         })
     }
 
