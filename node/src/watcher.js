@@ -9,28 +9,27 @@ module.exports = function(wallet, provider, contract, minExecutionFeeWei, webhoo
         let latestID = await contract.latestID()
         latestID = latestID.toNumber()
 
-        let orders = []
+        let orderIDs = Array.from(Array(latestID), (_, i) => i + 1) // array of IDs from 1 to latestDS
 
-        for (let i = 0; i <= latestID; i++) {
-            if(i === 0) continue;
-            // skip orders that were checked before
-            if(orderBlacklist[i]) continue;
-            let order = await contract.orders(i)
-
-            // blacklist and skip cancelled/executed order & those with insufficient execution fee
-            if(
-                order.submitter === ethers.constants.AddressZero
-                ||
-                order.executionFee.lte(minExecutionFeeWei)
-            ) {
-                orderBlacklist[i] = true;
-            } else {
-                order.id = i
-                orders.push(order)
-            }
-        }
+        let orders = await Promise.all(
+            orderIDs
+                .filter((id) => !orderBlacklist[id])
+                .map(id => contract.orders(id))
+        )
 
         return orders
+            .filter((order, i) => {
+                if(order.submitter === ethers.constants.AddressZero || order.executionFee.lte(minExecutionFeeWei)) {
+                    orderBlacklist[i + 1] = true
+                    return false
+                } else {
+                    return true
+                }
+            })
+            .map((order, i) => {
+                order.id = i + 1
+                return order
+            })
     }
 
     watchBalance = () => {
