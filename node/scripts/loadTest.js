@@ -8,9 +8,9 @@ const NETWORK = "kovan"
 const PROVIDER_URL = process.env.PROVIDER_URL
 const MIN_EXECUTION_FEE_WEI = "2"
 const PRIVATE_KEY = process.env.PRIVATE_KEY
-const NUM_ORDERS = 2
-const sourceCurrencyKey = ethers.utils.formatBytes32String("sUSD")
-const destinationCurrencyKey = ethers.utils.formatBytes32String("sETH")
+const NUM_ORDERS = 1
+const sourceCurrencyKey = ethers.utils.formatBytes32String("SynthUSD")
+const destinationCurrencyKey = ethers.utils.formatBytes32String("SynthETH")
 const sourceAmount = "1"
 const minDestinationAmount = "1"
 
@@ -39,19 +39,25 @@ getGasPrice = async () => {
 }
 
 main = async () => {
+
+    const latestID = await contract.latestID()
+    console.log("Latest ID", latestID.toNumber())
+
     const weiDeposit = (await provider.getGasPrice()).mul(500000).add(MIN_EXECUTION_FEE_WEI)
 
-    const approveTx = await delegateApprovalsContract.approveExchangeOnBehalf(CONTRACT_ADDRESS)
-    await approveTx.wait()
-    console.log("Delegated Approval successful")
-
-    for (let i = 0; i < NUM_ORDERS; i++) {
-        const tx = await contract.newOrder(sourceCurrencyKey, sourceAmount, destinationCurrencyKey, minDestinationAmount, MIN_EXECUTION_FEE_WEI, {
-            value: weiDeposit
-        })
-        console.log("Submitting tx:", i);
-        await tx.wait()
-        console.log("Submitted");
+    if(NUM_ORDERS > 0) {
+        const approveTx = await delegateApprovalsContract.approveExchangeOnBehalf(CONTRACT_ADDRESS)
+        await approveTx.wait()
+        console.log("Delegated Approval successful")
+    
+        for (let i = 0; i < NUM_ORDERS; i++) {
+            const tx = await contract.newOrder(sourceCurrencyKey, sourceAmount, destinationCurrencyKey, minDestinationAmount, MIN_EXECUTION_FEE_WEI, {
+                value: weiDeposit
+            })
+            console.log("Submitting tx:", i);
+            await tx.wait()
+            console.log("Submitted");
+        }
     }
 
 }
