@@ -8,7 +8,6 @@ const PROVIDER_URL = process.env.PROVIDER_URL
 const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS
 const NETWORK = process.env.NETWORK
 const MIN_EXECUTION_FEE_WEI = process.env.MIN_EXECUTION_FEE_WEI // string
-const GAS_PRICE_WEI = process.env.GAS_PRICE_WEI // string
 const NOTIFY_WEBHOOK = process.env.NOTIFY_WEBHOOK // string
 const LOW_BALANCE_THRESHOLD_WEI = process.env.LOW_BALANCE_THRESHOLD_WEI
 
@@ -24,7 +23,7 @@ const abi = [
 ]
 const contract = new ethers.Contract(CONTRACT_ADDRESS, abi, wallet);
 
-Execution(wallet, contract, GAS_PRICE_WEI).then((execution) => {
+Execution(wallet, contract).then((execution) => {
     const watcher = Watcher(wallet, provider, contract, MIN_EXECUTION_FEE_WEI, NOTIFY_WEBHOOK, LOW_BALANCE_THRESHOLD_WEI)
 
     watcher.watch(execution.executeOrders)

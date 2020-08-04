@@ -1,10 +1,18 @@
-module.exports = async function(wallet, contract, gasPrice) {
+module.exports = async function(wallet, contract) {
     const ethers = require('ethers')
+    const axios = require('axios');
     const Lock = require('lock').Lock
     const LocalServer = require('./localServer')
     const lock = Lock()
     let pendingTxs = {}
     let nonce = await wallet.getTransactionCount()
+
+    // returns FAST gas price in wei (type BigNumber)
+    getGasPrice = async () => {
+        const resp = await axios.get('https://ethgasstation.info/api/ethgasAPI.json')
+        const gweiPrice = Math.floor(resp.data.fast / 10)
+        return ethers.utils.parseUnits(String(gweiPrice), 'gwei')
+    }
 
     LocalServer((obj) => {
         lock("block", async (releaseBlock) => {
@@ -20,6 +28,7 @@ module.exports = async function(wallet, contract, gasPrice) {
 
     executeOrders = (orders) => {
         lock("block", async (releaseBlock) => {
+            const gasPrice = await getGasPrice()
             orders = orders
                 .filter((order) => !pendingTxs[order.id]) // remove orders that are already submitted in a pending tx
                 .map((order) => order.id)
@@ -27,13 +36,13 @@ module.exports = async function(wallet, contract, gasPrice) {
             for (let i = 0; i < orders.length; i++) {
                 const orderID = orders[i]
                 try {
-                    await contract.estimate.executeOrder(orderID, {gasPrice:ethers.utils.parseUnits(gasPrice, 'wei')})
+                    await contract.estimate.executeOrder(orderID, {gasPrice})
                 } catch(e) {
                     console.error("Order gas estimation failed", orderID, e)
                     continue;
                 }
                 try {
-                    const tx = await contract.executeOrder(orderID, {nonce, gasPrice:ethers.utils.parseUnits(gasPrice, 'wei')})
+                    const tx = await contract.executeOrder(orderID, {nonce, gasPrice})
                     nonce++;
                     pendingTxs[orderID] = true
                     tx.wait().then((receipt) => {
